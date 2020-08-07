@@ -1,4 +1,4 @@
-### RDMULTI
+# RDMULTI
 
 The `rdmulti` package provides Stata and R implementation of RD plots, estimation, inference and extrapolation methods for RD designs with multiple cutoffs and multiple scores.
 
