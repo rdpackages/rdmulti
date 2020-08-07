@@ -38,9 +38,9 @@ For overviews and introductions, see [rdpackages website]().
 
 - Keele and Titiunik (2015): [Geographic Boundaries as Regression Discontinuities](references/Keele-Titiunik_2015_PA.pdf), _Political Analysis_ 23(1): 127-155.
 
-- Cattaneo, Keele, Titiunik and Vazquez-Bare (2016): [Interpreting Regression Discontinuity Designs with Multiple Cutoffs](references/Cattaneo-Keele-Titiunik-VazquezBare_2016_JOP.pdf), _Journal of Politics_ 78(4): 1229-1248. [Supplemental Appendix](Cattaneo-Keele-Titiunik-VazquezBare_2016_JOP--Supplement.pdf).
+- Cattaneo, Keele, Titiunik and Vazquez-Bare (2016): [Interpreting Regression Discontinuity Designs with Multiple Cutoffs](references/Cattaneo-Keele-Titiunik-VazquezBare_2016_JOP.pdf), _Journal of Politics_ 78(4): 1229-1248. [Supplemental Appendix](references/Cattaneo-Keele-Titiunik-VazquezBare_2016_JOP--Supplement.pdf).
 
-- Cattaneo, Keele, Titiunik and Vazquez-Bare (2020): [Extrapolating Treatment Effects in Multi-Cutoff Regression Discontinuity Designs](references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA.pdf), _Journal of the American Statistical Association_, forthcoming. [Supplemental Appendix](Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA--Supplement.pdf).
+- Cattaneo, Keele, Titiunik and Vazquez-Bare (2020): [Extrapolating Treatment Effects in Multi-Cutoff Regression Discontinuity Designs](references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA.pdf), _Journal of the American Statistical Association_, forthcoming. [Supplemental Appendix](references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA--Supplement.pdf).
 
 <br>
 <br>
