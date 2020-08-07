@@ -1,6 +1,6 @@
 ### RDMULTI
 
-The rdmulti package provides Stata and R implementation of RD plots, estimation, inference and extrapolation methods for RD designs with multiple cutoffs and multiple scores.
+The `rdmulti` package provides Stata and R implementation of RD plots, estimation, inference and extrapolation methods for RD designs with multiple cutoffs and multiple scores.
 
 This work was supported in part by the National Science Foundation through grants [SES-1357561](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1357561).
 
@@ -28,7 +28,7 @@ install.packages('rdmulti')
 
 ## References
 
-For overviews and introductions, see [rdpackages website]().
+For overviews and introductions, see [rdpackages website](https://rdpackages.github.io).
 
 ### Software and Implementation
 
