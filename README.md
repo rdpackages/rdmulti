@@ -42,4 +42,4 @@ For overviews and introductions, see [rdpackages website](https://rdpackages.git
 
 - Cattaneo, Keele, Titiunik and Vazquez-Bare (2020): [Extrapolating Treatment Effects in Multi-Cutoff Regression Discontinuity Designs](https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA.pdf), _Journal of the American Statistical Association_, forthcoming. [Supplemental Appendix](https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA--Supplement.pdf).
 
-<br><br> 
+<br><br>
