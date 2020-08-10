@@ -1,5 +1,5 @@
 d RDMULTI: Estimation, inference, RD Plots, and extrapolation with multiple cutoffs and multiple scores RD designs.
-d          https://rdpackages.github.io/rdlocrand
+d          https://rdpackages.github.io/rdmulti
 
 v 0.4
 
