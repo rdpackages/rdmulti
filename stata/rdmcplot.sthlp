@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.4 22-Apr-2020}{...}
+{* *! version 0.5 2020-08-22}{...}
 {viewerjumpto "Syntax" "rdms##syntax"}{...}
 {viewerjumpto "Description" "rdms##description"}{...}
 {viewerjumpto "Options" "rdms##options"}{...}
@@ -51,26 +51,27 @@
 
 {p 4 8}{cmd:rdmcplot} plots estimated regression functions at each cutoff in regression discontinuity (RD) designs with multiple cutoffs.
 For methodological background see
-{browse "https://sites.google.com/site/rdpackages/rdrobust//Calonico-Cattaneo-Titiunik_2015_JASA.pdf":Calonico, Cattaneo and Titiunik (2015a)}, 
-{browse "https://sites.google.com/site/rdpackages/rdmulti/Keele-Titiunik_2015_PA.pdf":Keele and Titiunik (2015)},
-{browse "https://sites.google.com/site/rdpackages/rdmulti/Cattaneo-Keele-Titiunik-VazquezBare_2016_JOP.pdf":Cattaneo, Keele, Titiunik and Vazquez-Bare (2016)}, and
-{browse "https://sites.google.com/site/rdpackages/rdmulti/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA.pdf":Cattaneo, Keele, Titiunik and Vazquez-Bare (2021)}.{p_end}
+{browse "https://rdpackages.github.io/references/Calonico-Cattaneo-Titiunik_2015_JASA.pdf":Calonico, Cattaneo and Titiunik (2015a)}, 
+{browse "https://rdpackages.github.io/references/Calonico-Cattaneo-Titiunik_2015_JASA.pdf":Calonico, Cattaneo and Titiunik (2015a)}, 
+{browse "https://rdpackages.github.io/references/Keele-Titiunik_2015_PA.pdf":Keele and Titiunik (2015)},
+{browse "https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2016_JOP.pdf":Cattaneo, Keele, Titiunik and Vazquez-Bare (2016)}, and
+{browse "https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA.pdf":Cattaneo, Keele, Titiunik and Vazquez-Bare (2021)}.{p_end}
 
 {p 8 8}Companion commands are: {help rdmc:rdmc} for multi-cutoff RD estimation and inference, and {help rdms:rdms} for multi-score RD estimation and inference.{p_end}
 
 {p 8 8}A detailed introduction to this command is given in
-{browse "https://sites.google.com/site/rdpackages/rdmulti/Cattaneo-Titiunik-VazquezBare_2020_Stata.pdf": Cattaneo, Titiunik and Vazquez-Bare (2020)}.{p_end}
+{browse "https://rdpackages.github.io/references/Cattaneo-Titiunik-VazquezBare_2020_Stata.pdf": Cattaneo, Titiunik and Vazquez-Bare (2020)}.{p_end}
 
 {p 8 8}This command employs the Stata (and R) package {help rdrobust:rdrobust} for underlying calculations. See
-{browse "https://sites.google.com/site/rdpackages/rdrobust/Calonico-Cattaneo-Titiunik_2014_Stata.pdf":Calonico, Cattaneo and Titiunik (2014)},
-{browse "https://sites.google.com/site/rdpackages/rdrobust/Calonico-Cattaneo-Titiunik_2015_R.pdf":Calonico, Cattaneo and Titiunik (2015b)},
+{browse "https://rdpackages.github.io/references/Calonico-Cattaneo-Titiunik_2014_Stata.pdf":Calonico, Cattaneo and Titiunik (2014)},
+{browse "https://rdpackages.github.io/references/Calonico-Cattaneo-Titiunik_2015_R.pdf":Calonico, Cattaneo and Titiunik (2015b)},
 and
-{browse "https://sites.google.com/site/rdpackages/rdrobust/Calonico-Cattaneo-Farrell-Titiunik_2017_Stata.pdf":Calonico, Cattaneo, Farrell and Titiunik (2017)}
+{browse "https://rdpackages.github.io/references/Calonico-Cattaneo-Farrell-Titiunik_2017_Stata.pdf":Calonico, Cattaneo, Farrell and Titiunik (2017)}
 for more details.{p_end}
 
 {p 4 8}Related Stata and R packages useful for inference in RD designs are described in the following website:{p_end}
 
-{p 8 8}{browse "https://sites.google.com/site/rdpackages/":https://sites.google.com/site/rdpackages/}{p_end}
+{p 8 8}{browse "https://rdpackages.github.io/":https://rdpackages.github.io/}{p_end}
 
 
 {marker options}{...}
@@ -199,31 +200,31 @@ See {help rdplot:rdplot} for details.{p_end}
 {title:References}
 
 {p 4 8}Calonico, S., M. D. Cattaneo, M. H. Farrell, and R. Titiunik. 2017.
-{browse "https://sites.google.com/site/rdpackages/rdrobust/Calonico-Cattaneo-Farrell-Titiunik_2017_Stata.pdf":rdrobust: Software for Regression Discontinuity Designs}.{p_end}
+{browse "https://rdpackages.github.io/references/Calonico-Cattaneo-Farrell-Titiunik_2017_Stata.pdf":rdrobust: Software for Regression Discontinuity Designs}.{p_end}
 {p 8 8}{it:Stata Journal} 17(2): 372-404.{p_end}
 
 {p 4 8}Calonico, S., M. D. Cattaneo, and R. Titiunik. 2014.
-{browse "https://sites.google.com/site/rdpackages/rdrobust/Calonico-Cattaneo-Titiunik_2014_Stata.pdf":Robust Data-Driven Inference in the Regression-Discontinuity Design}.{p_end}
+{browse "https://rdpackages.github.io/references/Calonico-Cattaneo-Titiunik_2014_Stata.pdf":Robust Data-Driven Inference in the Regression-Discontinuity Design}.{p_end}
 {p 8 8}{it:Stata Journal} 14(4): 909-946.{p_end}
 
 {p 4 8}Calonico, S., M. D. Cattaneo, and R. Titiunik. 2015.
-{browse "https://sites.google.com/site/rdpackages/rdrobust/Calonico-Cattaneo-Titiunik_2015_R.pdf":rdrobust: An R Package for Robust Nonparametric Inference in Regression-Discontinuity Designs}.{p_end}
+{browse "https://rdpackages.github.io/references/Calonico-Cattaneo-Titiunik_2015_R.pdf":rdrobust: An R Package for Robust Nonparametric Inference in Regression-Discontinuity Designs}.{p_end}
 {p 8 8}{it:R Journal} 7(1): 38-51.{p_end}
 
 {p 4 8}Cattaneo, M. D., L. Keele, R. Titiunik, and G. Vazquez-Bare. 2016.
-{browse "https://sites.google.com/site/rdpackages/rdmulti/Cattaneo-Keele-Titiunik-VazquezBare_2016_JOP.pdf":Interpreting Regression Discontinuity Designs with Multiple Cutoffs}.{p_end}
+{browse "https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2016_JOP.pdf":Interpreting Regression Discontinuity Designs with Multiple Cutoffs}.{p_end}
 {p 8 8}{it:Journal of Politics} 78(4): 1229-124.{p_end}
 
 {p 4 8}Cattaneo, M. D., L. Keele, R. Titiunik, and G. Vazquez-Bare. 2021.
-{browse "https://sites.google.com/site/rdpackages/rdmulti/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA.pdf":Extrapolating Treatment Effects in Multi-Cutoff Regression Discontinuity Designs}.{p_end}
+{browse "https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA.pdf":Extrapolating Treatment Effects in Multi-Cutoff Regression Discontinuity Designs}.{p_end}
 {p 8 8}{it:Journal of American Statistical Association}, forthcoming.{p_end}
 
 {p 4 8}Cattaneo, M. D., R. Titiunik, and G. Vazquez-Bare. 2020.
-{browse "https://sites.google.com/site/rdpackages/rdmulti/Cattaneo-Titiunik-VazquezBare_2020_Stata.pdf":Analysis of Regression Discontinuity Designs with Multiple Cutoffs or Multiple Scores}.{p_end}
+{browse "https://rdpackages.github.io/references/Cattaneo-Titiunik-VazquezBare_2020_Stata.pdf":Analysis of Regression Discontinuity Designs with Multiple Cutoffs or Multiple Scores}.{p_end}
 {p 8 8}{it:Working paper}.{p_end}
 
 {p 4 8}Keele, L., and R. Titiunik. 2015.
-{browse "https://sites.google.com/site/rdpackages/rdmulti/Keele-Titiunik_2015_PA.pdf":Geographic Boundaries as Regression Discontinuities}.{p_end}
+{browse "https://rdpackages.github.io/references/Keele-Titiunik_2015_PA.pdf":Geographic Boundaries as Regression Discontinuities}.{p_end}
 {p 8 8}{it:Political Analysis} 23(1): 127-155.{p_end}
 
 

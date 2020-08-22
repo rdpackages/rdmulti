@@ -1,6 +1,6 @@
 ********************************************************************************
 * RDMS: analysis of Regression Discontinuity Designs with multiple scores
-* !version 0.4 22-Apr-2020
+* !version 0.5 2020-08-22
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 

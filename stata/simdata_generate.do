@@ -2,7 +2,6 @@
 ** RDMULTI: analysis of Regression Discontinuity Designs 
 ** 		    with multiple cutoffs or scores
 ** Simulated datasets
-** Date: 22-Apr-2020
 ** Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
