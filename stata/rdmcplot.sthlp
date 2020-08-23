@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.5 2020-08-22}{...}
+{* *! version 0.5 2020-08-23}{...}
 {viewerjumpto "Syntax" "rdms##syntax"}{...}
 {viewerjumpto "Description" "rdms##description"}{...}
 {viewerjumpto "Options" "rdms##options"}{...}
@@ -213,7 +213,7 @@ See {help rdplot:rdplot} for details.{p_end}
 
 {p 4 8}Cattaneo, M. D., L. Keele, R. Titiunik, and G. Vazquez-Bare. 2016.
 {browse "https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2016_JOP.pdf":Interpreting Regression Discontinuity Designs with Multiple Cutoffs}.{p_end}
-{p 8 8}{it:Journal of Politics} 78(4): 1229-124.{p_end}
+{p 8 8}{it:Journal of Politics} 78(4): 1229-1248.{p_end}
 
 {p 4 8}Cattaneo, M. D., L. Keele, R. Titiunik, and G. Vazquez-Bare. 2021.
 {browse "https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA.pdf":Extrapolating Treatment Effects in Multi-Cutoff Regression Discontinuity Designs}.{p_end}
@@ -221,7 +221,7 @@ See {help rdplot:rdplot} for details.{p_end}
 
 {p 4 8}Cattaneo, M. D., R. Titiunik, and G. Vazquez-Bare. 2020.
 {browse "https://rdpackages.github.io/references/Cattaneo-Titiunik-VazquezBare_2020_Stata.pdf":Analysis of Regression Discontinuity Designs with Multiple Cutoffs or Multiple Scores}.{p_end}
-{p 8 8}{it:Working paper}.{p_end}
+{p 8 8}{it:Stata Journal}, forthcoming.{p_end}
 
 {p 4 8}Keele, L., and R. Titiunik. 2015.
 {browse "https://rdpackages.github.io/references/Keele-Titiunik_2015_PA.pdf":Geographic Boundaries as Regression Discontinuities}.{p_end}
