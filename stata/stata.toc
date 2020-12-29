@@ -1,6 +1,2 @@
-v 3
-d RDMULTI: Estimation, inference, RD Plots, and extrapolation with multiple cutoffs and multiple scores.
-d          https://rdpackages.github.io/rdmulti
-d
-
+v 0.6
 p rdmulti

@@ -46,6 +46,8 @@ rdmc y x, c(c) bwselect(bwselect)
 * Add plot
 
 rdmc y x, c(c) plot
+graph display coefs
+graph display weights
 
 * Post estimation testing
 

@@ -36,7 +36,7 @@ replace c = c*100
 sort x
 drop Y*
 
-save simdata_multic, replace
+*save simdata_multic, replace
 *export delimited simdata_multic, replace
 
 
@@ -66,7 +66,7 @@ replace c = 66 in 2
 
 drop Y*
 
-save simdata_cumul, replace
+*save simdata_cumul, replace
 *export delimited simdata_cumul, replace
 
 
@@ -101,5 +101,5 @@ replace c2 = 50 in 2
 replace c2 = 25 in 3
 drop Y0
 
-save simdata_multis, replace
+*save simdata_multis, replace
 *export delimited simdata_multis, replace

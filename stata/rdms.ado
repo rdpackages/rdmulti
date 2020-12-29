@@ -1,6 +1,6 @@
 ********************************************************************************
 * RDMS: analysis of Regression Discontinuity Designs with multiple scores
-* !version 0.5 2020-08-22
+* !version 0.6 2020-12-28
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
@@ -494,8 +494,8 @@ program define rdms, eclass sortpreserve
 			}		
 			
 			qui rdrobust `yvar' `xc_`c'' if `range_c'[`c']<=`xc_`c'' & `xc_`c''<=`range_t'[`c'] & `touse', `deriv_opt' `p_opt' `q_opt' `h_opt' `b_opt' `rho_opt' `covs_opt' `covsdrop_opt' ///
-																											`k_opt' `weights_opt' `bwselect_opt' `vce_opt' `scalepar_opt' `scaleregul_opt' ///
-																											`fuzzy_opt'  level(`level') `masspoints_opt' `bwcheck_opt' `bwrestrict_opt' `stdvars_opt'
+																										   `k_opt' `weights_opt' `bwselect_opt' `vce_opt' `scalepar_opt' `scaleregul_opt' ///
+																										   `fuzzy_opt'  level(`level') `masspoints_opt' `bwcheck_opt' `bwrestrict_opt' `stdvars_opt'
 			
 			local h_`c' = e(h_l)
 			local n_h_`c' = e(N_h_l) + e(N_h_r)
@@ -527,7 +527,7 @@ program define rdms, eclass sortpreserve
 		
 			local cutoff_`c'_1 = round(`cvar'[`c'],.001)
 			local cutoff_`c'_2 = round(`cvar2'[`c'],.001)
-			local cutoff_`c' = abbrev("(`cutoff_`c'_1',`cutoff_`c'_2')",19)
+			local cutoff_`c' = abbrev("(`cutoff_`c'_1',`cutoff_`c'_2')",15)
 		
 			* Calculate (Euclidean) distance to cutoff
 			
@@ -684,8 +684,15 @@ program define rdms, eclass sortpreserve
 	di as text "{ralign 15:Cutoff}" as text _col(14) "{c |}"	_col(23) "Coef." 					_col(33) "P>|z|"  				_col(43)  "[95% Conf. Int.]"	_col(64) "hl"	_col(71) "hr"	_col(79) "Nh"
 	di as text "{hline 15}{c +}{hline 64}"
 
-	forvalues c = 1/`n_cutoffs'{
-		di as res "{ralign 15: `cutoff_`c''}"	as text _col(14) "{c |}"	as res	_col(19) %9.3f coefs[1,`c'] 			_col(29)  %9.3f pv_rb[1,`c']			_col(40) %9.2f CI_rb[1,`c'] %9.2f CI_rb[2,`c']						_col(60) %7.2f H[1,`c'] %7.2f H[2,`c'] 						_col(75) %6.0f sampsis[1,`c']+sampsis[2,`c']
+	if "`xvar2'"==""{
+		forvalues c = 1/`n_cutoffs'{
+			di as res %15.3f `cutoff_`c''	as text _col(14) "{c |}"	as res	_col(19) %9.3f coefs[1,`c'] 			_col(29)  %9.3f pv_rb[1,`c']			_col(40) %9.2f CI_rb[1,`c'] %9.2f CI_rb[2,`c']						_col(60) %7.2f H[1,`c'] %7.2f H[2,`c'] 						_col(75) %6.0f sampsis[1,`c']+sampsis[2,`c']
+		}
+	}
+	else{
+	  	forvalues c = 1/`n_cutoffs'{
+			di as res "{ralign 15: `cutoff_`c''}"	as text _col(14) "{c |}"	as res	_col(19) %9.3f coefs[1,`c'] 			_col(29)  %9.3f pv_rb[1,`c']			_col(40) %9.2f CI_rb[1,`c'] %9.2f CI_rb[2,`c']						_col(60) %7.2f H[1,`c'] %7.2f H[2,`c'] 						_col(75) %6.0f sampsis[1,`c']+sampsis[2,`c']
+		}
 	}
 		
 	if "`xnorm'"!=""{

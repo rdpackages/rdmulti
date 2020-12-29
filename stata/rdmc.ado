@@ -1,6 +1,6 @@
 ********************************************************************************
 * RDMC: analysis of Regression Discontinuity Designs with multiple cutoffs
-* !version 0.5 2020-08-22
+* !version 0.6 2020-12-28
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
@@ -479,9 +479,9 @@ program define rdmc, eclass sortpreserve
 		}
 
 		
-		capture rdrobust `yvar' `rv_norm' if `cvar'==`cutoff' & `touse', `deriv_opt' `p_opt' `q_opt' `h_opt' `b_opt' `rho_opt' `covs_opt' `covsdrop_opt' ///
-																		 `k_opt' `weights_opt' `bwselect_opt' `vce_opt' `scalepar_opt' `scaleregul_opt' ///
-																		 `fuzzy_opt'  level(`level') `masspoints_opt' `bwcheck_opt' `bwrestrict_opt' `stdvars_opt'
+		capture rdrobust `yvar' `rv_norm' if abs(`cvar'-`cutoff')<=c(epsfloat) & `touse', `deriv_opt' `p_opt' `q_opt' `h_opt' `b_opt' `rho_opt' `covs_opt' `covsdrop_opt' ///
+																		         `k_opt' `weights_opt' `bwselect_opt' `vce_opt' `scalepar_opt' `scaleregul_opt' ///
+																		         `fuzzy_opt'  level(`level') `masspoints_opt' `bwcheck_opt' `bwrestrict_opt' `stdvars_opt'
 		
 		if _rc!=0{
 			di as error "rdrobust could not run in cutoff `cutoff'. Please check this cutoff manually." 
@@ -544,7 +544,7 @@ program define rdmc, eclass sortpreserve
 
 	foreach c of local cutoff_list{
 
-		di as res "{ralign 12:`c'}"  		as text _col(10) "{c |}"	as res	_col(13) %9.3f coefs[1,`count'] 		_col(20)  %8.2f pv_rb[1,`count']	_col(33) %8.2f CI_rb[1,`count'] %8.2f CI_rb[2,`count']				_col(51) %7.2f H[1,`count'] 			_col(58) %7.2f H[2,`count']			_col(66) %6.0f sampsis[1,`count']+sampsis[2,`count'] 				_col(72) %9.3f weights[1,`count']			
+		di as res %12.3f `c'  		as text _col(10) "{c |}"	as res	_col(13) %9.3f coefs[1,`count'] 		_col(20)  %8.2f pv_rb[1,`count']	_col(33) %8.2f CI_rb[1,`count'] %8.2f CI_rb[2,`count']				_col(51) %7.2f H[1,`count'] 			_col(58) %7.2f H[2,`count']			_col(66) %6.0f sampsis[1,`count']+sampsis[2,`count'] 				_col(72) %9.3f weights[1,`count']			
 		local ++count
 
 	}

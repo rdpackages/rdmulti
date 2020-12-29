@@ -1,6 +1,6 @@
 ********************************************************************************
 * RDMCPLOT: Regression discontinuity plots with multiple cutoffs
-* !version 0.5 2020-08-22
+* !version 0.6 2020-12-28
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
@@ -422,23 +422,25 @@ program define rdmcplot, rclass
 
 			qui {
 				capture drop rdplot_*
-				rdplot `yvar' `xvar' if `cvar'==`c' & `touse' `range_cond', c(`c') `p_opt' `nbins_opt' `covs_opt' `covseval_opt' `covsdrop_opt' `binselect_opt' ///
+				capture rdplot `yvar' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `touse' `range_cond', c(`c') `p_opt' `nbins_opt' `covs_opt' `covseval_opt' `covsdrop_opt' `binselect_opt' ///
 					`scale_opt' `kernel_opt' `weights_opt' `h_opt' `support_opt' genvars hide
+				
+				if _rc!=0{
+					di as error "rdplot could not run in cutoff `c'. Please check this cutoff manually." 
+					exit 2001
+				}
 				
 				gen double `yhat_`i'' = rdplot_hat_y
 				gen double `ybar_`i'' = rdplot_mean_y	
 				gen double `xbar_`i'' = rdplot_mean_x
 
-				if `ci'>0{
-
-				}
 			}
 
 			if "`genvars'" != ""{
 				qui gen double rdmcplot_hat_y_`i' = `yhat_`i''
 				qui gen double rdmcplot_mean_y_`i' = `ybar_`i''
 				qui gen double rdmcplot_mean_x_`i' = `xbar_`i''
-				
+
 				label variable rdmcplot_hat_y_`i' "Predicted polynomial for c=`c'"
 				label variable rdmcplot_mean_y_`i' "Bin mean of y for c=`c'"
 				label variable rdmcplot_mean_x_`i' "Bin mean of x for c=`c'"
