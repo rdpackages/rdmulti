@@ -1,6 +1,6 @@
 ********************************************************************************
 * RDMCPLOT: Regression discontinuity plots with multiple cutoffs
-* !version 0.6 2020-12-28
+* !version 0.6 2020-12-30
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
@@ -59,7 +59,7 @@ program define rdmcplot, rclass
 		qui count if `pvar'!=.
 		local n_pvar = r(N)
 		if `n_pvar' != `n_cutoffs' {
-			di as error "lengths of pvar and cvar have to coincide"
+			di as error "length of pvar should equal number of cutoffs"
 			exit 125
 		}
 	}
@@ -73,7 +73,7 @@ program define rdmcplot, rclass
 		qui count if `nbinsvar'!=.
 		local n_nbinsvar = r(N)
 		if `n_nbinsvar' != `n_cutoffs' {
-			di as error "lengths of nbins and cvar have to coincide"
+			di as error "length of nbins should equal number of cutoffs"
 			exit 125
 		}
 		if "`nbinsrightvar'"==""{
@@ -89,7 +89,7 @@ program define rdmcplot, rclass
 			qui count if `nbinsrightvar'!=.
 			local n_nbinsrightvar = r(N)
 			if `n_nbinsrightvar' != `n_cutoffs' {
-				di as error "lengths of nbinsright and cvar have to coincide"
+				di as error "length of nbinsright should equal number of cutoffs"
 				exit 125
 			}
 		}
@@ -104,7 +104,7 @@ program define rdmcplot, rclass
 		qui count if `covsvar'!=""
 		local n_covsvar = r(N)
 		if `n_covsvar' != `n_cutoffs' {
-			di as error "lengths of covs and cvar have to coincide"
+			di as error "length of covs should equal number of cutoffs"
 			exit 125
 		}
 	}
@@ -118,7 +118,7 @@ program define rdmcplot, rclass
 		qui count if `covsevalvar'!=""
 		local n_covsevalvar = r(N)
 		if `n_covsevalvar' != `n_cutoffs' {
-			di as error "lengths of covseval and cvar have to coincide"
+			di as error "length of covseval should equal number of cutoffs"
 			exit 125
 		}
 	}
@@ -132,7 +132,7 @@ program define rdmcplot, rclass
 		qui count if `covsdropvar'!=""
 		local n_covsdropvar = r(N)
 		if `n_covsdropvar' != `n_cutoffs' {
-			di as error "lengths of covsdropvar and cvar have to coincide"
+			di as error "length of covsdropvar should equal number of cutoffs"
 			exit 125
 		}
 	}
@@ -146,7 +146,7 @@ program define rdmcplot, rclass
 		qui count if `binselectvar'!=""
 		local n_binselectvar = r(N)
 		if `n_binselectvar' != `n_cutoffs' {
-			di as error "lengths of binselect and cvar have to coincide"
+			di as error "length of binselect should equal number of cutoffs"
 			exit 125
 		}
 	}
@@ -160,7 +160,7 @@ program define rdmcplot, rclass
 		qui count if `scalevar'!=.
 		local n_scalevar = r(N)
 		if `n_scalevar' != `n_cutoffs' {
-			di as error "lengths of scale and cvar have to coincide"
+			di as error "length of scale should equal number of cutoffs"
 			exit 125
 		}
 		if "`scalerightvar'"==""{
@@ -176,7 +176,7 @@ program define rdmcplot, rclass
 			qui count if `scalerightvar'!=.
 			local n_scalerightvar = r(N)
 			if `n_scalerightvar' != `n_cutoffs' {
-				di as error "lengths of scaleright and cvar have to coincide"
+				di as error "length of scaleright should equal number of cutoffs"
 				exit 125
 			}
 		}
@@ -191,7 +191,7 @@ program define rdmcplot, rclass
 		qui count if `kernelvar'!=""
 		local n_kernelvar = r(N)
 		if `n_kernelvar' != `n_cutoffs' {
-			di as error "lengths of kernelvar and cvar have to coincide"
+			di as error "length of kernelvar should equal number of cutoffs"
 			exit 125
 		}
 	}
@@ -205,7 +205,7 @@ program define rdmcplot, rclass
 		qui count if `weightsvar'!=""
 		local weightsvar = r(N)
 		if `n_weightsvar' != `n_cutoffs' {
-			di as error "lengths of weightsvar and cvar have to coincide"
+			di as error "length of weightsvar should equal number of cutoffs"
 			exit 125
 		}
 	}	
@@ -219,7 +219,7 @@ program define rdmcplot, rclass
 		qui count if `hvar'!=.
 		local n_hvar = r(N)
 		if `n_hvar' != `n_cutoffs' {
-			di as error "lengths of hvar and cvar have to coincide"
+			di as error "length of hvar should equal number of cutoffs"
 			exit 125
 		}
 		if "`hrightvar'"==""{
@@ -235,7 +235,7 @@ program define rdmcplot, rclass
 			qui count if `hrightvar'!=.
 			local n_hrightvar = r(N)
 			if `n_hrightvar' != `n_cutoffs' {
-				di as error "lengths of hrightvar and cvar have to coincide"
+				di as error "length of hrightvar should equal number of cutoffs"
 				exit 125
 			}
 		}
@@ -250,7 +250,7 @@ program define rdmcplot, rclass
 		qui count if `supportvar'!=.
 		local n_supportvar = r(N)
 		if `n_supportvar' != `n_cutoffs' {
-			di as error "lengths of support and cvar have to coincide"
+			di as error "length of support should equal number of cutoffs"
 			exit 125
 		}
 		if "`supportrightvar'"==""{
@@ -266,7 +266,7 @@ program define rdmcplot, rclass
 			qui count if `supportrightvar'!=.
 			local n_supportrightvar = r(N)
 			if `n_supportrightvar' != `n_cutoffs' {
-				di as error "lengths of supportright and cvar have to coincide"
+				di as error "length of supportright should equal number of cutoffs"
 				exit 125
 			}
 		}
@@ -281,7 +281,7 @@ program define rdmcplot, rclass
 		qui count if `binsoptvar'!=""
 		local n_binsoptvar = r(N)
 		if `n_binsoptvar' != `n_cutoffs' {
-			di as error "lengths of binsopt and cvar have to coincide"
+			di as error "length of binsopt should equal number of cutoffs"
 			exit 125
 		}
 	}
@@ -295,7 +295,7 @@ program define rdmcplot, rclass
 		qui count if `lineoptvar'!=""
 		local n_lineoptvar = r(N)
 		if `n_lineoptvar' != `n_cutoffs' {
-			di as error "lengths of lineopt and cvar have to coincide"
+			di as error "length of lineopt should equal number of cutoffs"
 			exit 125
 		}
 	}
@@ -309,7 +309,7 @@ program define rdmcplot, rclass
 		qui count if `xlineoptvar'!=""
 		local n_xlineoptvar = r(N)
 		if `n_xlineoptvar' != `n_cutoffs' {
-			di as error "lengths of xlineopt and cvar have to coincide"
+			di as error "length of xlineopt should equal number of cutoffs"
 			exit 125
 		}
 	}
@@ -328,21 +328,16 @@ program define rdmcplot, rclass
 ********************************************************************************	
 
 	local i = 1
-	local count = 0
+	local count_fail = 0
 	foreach c of numlist `clist'{
 		
 		tempvar yhat_`i' ybar_`i' xbar_`i' cileft_`i' ciright_`i'
 		
-		if "`colorlist1'"==""{
-			local colorlist1 "`colorlist'"
-			local count = `count' + 1
+		if mod(`i',10)==0{
+			local colorlist1 "`colorlist'" 
 		}
-		
 		gettoken color colorlist1 : colorlist1
-		
-		local f = 1 - 0.2*`count'
-		local color "`color'*`f'"
-		
+
 		if "`pvar'"!=""{
 			local p = `pvar'[`i']
 			local p_opt "p(`p')"
@@ -423,88 +418,98 @@ program define rdmcplot, rclass
 			qui {
 				capture drop rdplot_*
 				capture rdplot `yvar' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `touse' `range_cond', c(`c') `p_opt' `nbins_opt' `covs_opt' `covseval_opt' `covsdrop_opt' `binselect_opt' ///
-					`scale_opt' `kernel_opt' `weights_opt' `h_opt' `support_opt' genvars hide
-				
+					                                                                                 `scale_opt' `kernel_opt' `weights_opt' `h_opt' `support_opt' genvars hide
+
 				if _rc!=0{
-					di as error "rdplot could not run in cutoff `c'. Please check this cutoff manually." 
-					exit 2001
-				}
-				
-				gen double `yhat_`i'' = rdplot_hat_y
-				gen double `ybar_`i'' = rdplot_mean_y	
-				gen double `xbar_`i'' = rdplot_mean_x
-
-			}
-
-			if "`genvars'" != ""{
-				qui gen double rdmcplot_hat_y_`i' = `yhat_`i''
-				qui gen double rdmcplot_mean_y_`i' = `ybar_`i''
-				qui gen double rdmcplot_mean_x_`i' = `xbar_`i''
-
-				label variable rdmcplot_hat_y_`i' "Predicted polynomial for c=`c'"
-				label variable rdmcplot_mean_y_`i' "Bin mean of y for c=`c'"
-				label variable rdmcplot_mean_x_`i' "Bin mean of x for c=`c'"
-
-			}
-
-			local scat_plots "`scat_plots' (scatter `ybar_`i'' `xbar_`i'', msize(small) mcolor(`color') `bins_opt')"
-			local line_plots "`line_plots' (line `yhat_`i'' `xvar' if `cvar'==`c' & `treated'==1, sort lwidth(medthin) lcolor(`color') `line_opt')(line `yhat_`i'' `xvar' if `cvar'==`c' & `treated'==0, sort lwidth(medthin) lcolor(`color') `line_opt')"
-
-			if "`noxline'" == ""{
-				if "`xlineoptvar'" == ""{
-					local xline_plots "`xline_plots' xline(`c', lcolor(`color') lwidth(medthin) lpattern(shortdash) `xline_opt')"
+					if `count_fail'==0{
+						mat c_failed = J(1,1,`c')
+					}
+					else{
+						mat c_failed = (c_failed,`c')
+					}
+					local ++count_fail
 				}
 				else {
-					local xline_plots "`xline_plots' xline(`c', `xline_opt')"
+					gen double `yhat_`i'' = rdplot_hat_y
+					gen double `ybar_`i'' = rdplot_mean_y	
+					gen double `xbar_`i'' = rdplot_mean_x
+
+					if "`genvars'" != ""{
+						gen double rdmcplot_hat_y_`i' = `yhat_`i''
+						gen double rdmcplot_mean_y_`i' = `ybar_`i''
+						gen double rdmcplot_mean_x_`i' = `xbar_`i''
+
+						label variable rdmcplot_hat_y_`i' "Predicted polynomial for c=`c'"
+						label variable rdmcplot_mean_y_`i' "Bin mean of y for c=`c'"
+						label variable rdmcplot_mean_x_`i' "Bin mean of x for c=`c'"
+					}
+					local scat_plots "`scat_plots' (scatter `ybar_`i'' `xbar_`i'', msize(small) mcolor(`color') `bins_opt')"
+					local line_plots "`line_plots' (line `yhat_`i'' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `treated'==1, sort lwidth(medthin) lcolor(`color') `line_opt')(line `yhat_`i'' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `treated'==0, sort lwidth(medthin) lcolor(`color') `line_opt')"
+
+					if "`noxline'" == ""{
+						if "`xlineoptvar'" == ""{
+							local xline_plots "`xline_plots' xline(`c', lcolor(`color') lwidth(medthin) lpattern(shortdash) `xline_opt')"
+						}
+						else {
+							local xline_plots "`xline_plots' xline(`c', `xline_opt')"
+						}
+					}
 				}
 			}
-
 		}
-		
+
 		else {
+			
 			qui {
 				capture drop rdplot_*
-				rdplot `yvar' `xvar' if `cvar'==`c' & `touse' `range_cond', c(`c') `p_opt' `nbins_opt' `covs_opt' `covseval_opt' `covsdrop_opt' `binselect_opt' ///
-					`scale_opt' `kernel_opt' `weights_opt' `h_opt' `support_opt' genvars hide ci(`ci')
-				gen double `yhat_`i'' = rdplot_hat_y
-				gen double `ybar_`i'' = rdplot_mean_y	
-				gen double `xbar_`i'' = rdplot_mean_x
-				gen double `cileft_`i'' = rdplot_ci_l
-				gen double `ciright_`i'' = rdplot_ci_r 
+				capture rdplot `yvar' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `touse' `range_cond', c(`c') `p_opt' `nbins_opt' `covs_opt' `covseval_opt' `covsdrop_opt' `binselect_opt' ///
+					                                                                                 `scale_opt' `kernel_opt' `weights_opt' `h_opt' `support_opt' genvars hide ci(`ci')
 
-			}
-
-			if "`genvars'" != ""{
-				qui gen double rdmcplot_hat_y_`i' = `yhat_`i''
-				qui gen double rdmcplot_mean_y_`i' = `ybar_`i''
-				qui gen double rdmcplot_mean_x_`i' = `xbar_`i''
-				qui gen double rdmcplot_ci_l_`i' = `cileft_`i''
-				qui gen double rdmcplot_ci_r_`i' = `ciright_`i''
-				
-				label variable rdmcplot_hat_y_`i' "Predicted polynomial for c=`c'"
-				label variable rdmcplot_mean_y_`i' "Bin mean of y for c=`c'"
-				label variable rdmcplot_mean_x_`i' "Bin mean of x for c=`c'"
-				label variable rdmcplot_ci_l_`i' "Left CI for c=`c'"
-				label variable rdmcplot_ci_r_`i' "Right CI for c=`c'"
-			}
-
-			local scat_plots "`scat_plots' (scatter `ybar_`i'' `xbar_`i'', msize(small) mcolor(`color') `bins_opt')"
-			local line_plots "`line_plots' (line `yhat_`i'' `xvar' if `cvar'==`c' & `treated'==1, sort lwidth(medthin) lcolor(`color') `line_opt')(line `yhat_`i'' `xvar' if `cvar'==`c' & `treated'==0, sort lwidth(medthin) lcolor(`color') `line_opt')"
-			local ci_plots "`ci_plots' (rcap `cileft_`i'' `ciright_`i'' `xbar_`i'', lcolor(`color'))"
-			
-			if "`noxline'" == ""{
-				if "`xlineoptvar'" == ""{
-					local xline_plots "`xline_plots' xline(`c', lcolor(`color') lwidth(medthin) lpattern(shortdash) `xline_opt')"
+				if _rc!=0{
+					if `count_fail'==0{
+						mat c_failed = J(1,1,`c')
+					}
+					else{
+						mat c_failed = (c_failed,`c')
+					}
+					local ++count_fail
 				}
 				else {
-					local xline_plots "`xline_plots' xline(`c', `xline_opt')"
+					gen double `yhat_`i'' = rdplot_hat_y
+					gen double `ybar_`i'' = rdplot_mean_y	
+					gen double `xbar_`i'' = rdplot_mean_x
+					gen double `cileft_`i'' = rdplot_ci_l
+					gen double `ciright_`i'' = rdplot_ci_r 
+					if "`genvars'" != ""{
+						qui gen double rdmcplot_hat_y_`i' = `yhat_`i''
+						qui gen double rdmcplot_mean_y_`i' = `ybar_`i''
+						qui gen double rdmcplot_mean_x_`i' = `xbar_`i''
+						qui gen double rdmcplot_ci_l_`i' = `cileft_`i''
+						qui gen double rdmcplot_ci_r_`i' = `ciright_`i''
+
+						label variable rdmcplot_hat_y_`i' "Predicted polynomial for c=`c'"
+						label variable rdmcplot_mean_y_`i' "Bin mean of y for c=`c'"
+						label variable rdmcplot_mean_x_`i' "Bin mean of x for c=`c'"
+						label variable rdmcplot_ci_l_`i' "Left CI for c=`c'"
+						label variable rdmcplot_ci_r_`i' "Right CI for c=`c'"
+					}
+
+					local scat_plots "`scat_plots' (scatter `ybar_`i'' `xbar_`i'', msize(small) mcolor(`color') `bins_opt')"
+					local line_plots "`line_plots' (line `yhat_`i'' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `treated'==1, sort lwidth(medthin) lcolor(`color') `line_opt')(line `yhat_`i'' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `treated'==0, sort lwidth(medthin) lcolor(`color') `line_opt')"
+					local ci_plots "`ci_plots' (rcap `cileft_`i'' `ciright_`i'' `xbar_`i'', lcolor(`color'))"
+
+					if "`noxline'" == ""{
+						if "`xlineoptvar'" == ""{
+							local xline_plots "`xline_plots' xline(`c', lcolor(`color') lwidth(medthin) lpattern(shortdash) `xline_opt')"
+						}
+						else {
+							local xline_plots "`xline_plots' xline(`c', `xline_opt')"
+						}
+					}
 				}
 			}
-		
 		}
-		
 
-		
 		local ++i
 	}
 	
@@ -525,13 +530,20 @@ program define rdmcplot, rclass
 		}
 	}
 	
+	if `count_fail'>0{
+		di as error "Warning: rdrobust could not run in one or more cutoffs."
+		di as error "See {stata matlist r(c_failed)} for details."
+	}
 	
 ********************************************************************************
 ** Return values
 ********************************************************************************
 	
-	drop rdplot_*
+	capture drop rdplot_*
 	
+	if `count_fail'>0{
+		return matrix c_failed = c_failed	
+	}	
 	ret local clist `clist'
 	ret local cvar `cvar'
 	ret scalar n_cutoffs = `n_cutoffs'

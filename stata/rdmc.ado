@@ -1,6 +1,6 @@
 ********************************************************************************
 * RDMC: analysis of Regression Discontinuity Designs with multiple cutoffs
-* !version 0.6 2020-12-28
+* !version 0.6 2020-12-30
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
@@ -343,15 +343,17 @@ program define rdmc, eclass sortpreserve
 	}
 	
 	tempname b V
-	mat `b' = J(1,`n_cutoffs'+2,.)
-	mat `V' = J(`n_cutoffs'+2,`n_cutoffs'+2,0)
+	mat `b' = J(1,1,.)
+	mat Vdiag = J(1,1,0)
+	mat `V' = J(1,1,0)
+	
 	mat sampsis = J(2,`n_cutoffs'+2,.)
 	mat weights = J(1,`n_cutoffs',.)
 	mat coefs = J(1,`n_cutoffs'+2,.)
 	mat CI_rb = J(2,`n_cutoffs'+2,.)
 	mat H = J(2,`n_cutoffs'+2,.)
 	mat pv_rb = J(1,`n_cutoffs'+2,.)
-
+	
 
 ********************************************************************************
 *** Calculate pooled estimate
@@ -364,9 +366,9 @@ program define rdmc, eclass sortpreserve
 	`quietlylocal' rdrobust `yvar' `rv_norm' if `touse', `pooled_opt' `fuzzy_opt' level(`level')
 	
 	local se_rb_pooled = e(se_tau_rb)
+	local tau_bc_pooled = e(tau_bc)
+	local V_bc_pooled = e(se_tau_rb)^2
 	
-	mat `b'[1,`n_cutoffs'+2] = e(tau_bc)
-	mat `V'[`n_cutoffs'+2,`n_cutoffs'+2] = e(se_tau_rb)^2
 	mat coefs[1,`n_cutoffs'+2] = e(tau_cl)
 	mat CI_rb[1,`n_cutoffs'+2] = e(ci_l_rb)
 	mat CI_rb[2,`n_cutoffs'+2] = e(ci_r_rb)
@@ -382,6 +384,8 @@ program define rdmc, eclass sortpreserve
 ********************************************************************************
 	
 	local count = 1
+	local count_ok = 1
+	local count_fail = 0
 	foreach cutoff of local cutoff_list{
 
 		* Compute cutoff-specific estimates
@@ -483,46 +487,79 @@ program define rdmc, eclass sortpreserve
 																		         `k_opt' `weights_opt' `bwselect_opt' `vce_opt' `scalepar_opt' `scaleregul_opt' ///
 																		         `fuzzy_opt'  level(`level') `masspoints_opt' `bwcheck_opt' `bwrestrict_opt' `stdvars_opt'
 		
-		if _rc!=0{
-			di as error "rdrobust could not run in cutoff `cutoff'. Please check this cutoff manually." 
-			exit 2001
-		}
-		
 		local colname "`colname' c`count'"
 		
-		mat `b'[1,`count'] = e(tau_bc)
-		mat `V'[`count',`count'] = e(se_tau_rb)^2
-		mat coefs[1,`count'] = e(tau_cl)
-		mat CI_rb[1,`count'] = e(ci_l_rb)
-		mat CI_rb[2,`count'] = e(ci_r_rb)
-		mat H[1,`count'] = e(h_l)
-		mat H[2,`count'] = e(h_r)
-		mat sampsis[1,`count'] = e(N_h_l)
-		mat sampsis[2,`count'] = e(N_h_r)
-		mat pv_rb[1,`count'] = e(pv_rb)
+		if _rc!=0 | e(se_tau_rb)==.{
+			if `count_fail'==0{
+				mat c_failed = J(1,1,`cutoff')
+			}
+			else{
+				mat c_failed = (c_failed,`cutoff')
+			}
+			local ++count_fail
+		}
+		else {
+			
+			local colname_aux "`colname_aux' c`count'"
+
+			if `count_ok'==1{				
+				mat `b' = e(tau_bc)
+				mat coefs_aux = e(tau_cl)
+				mat Vdiag = e(se_tau_rb)^2
+			}
+			else{
+				mat `b'= (`b',e(tau_bc))
+				mat coefs_aux= (coefs_aux,e(tau_bc))
+				mat Vdiag = (Vdiag,e(se_tau_rb)^2)			
+			}		
+			
+			mat coefs[1,`count'] = e(tau_cl)
+			mat CI_rb[1,`count'] = e(ci_l_rb)
+			mat CI_rb[2,`count'] = e(ci_r_rb)
+			mat H[1,`count'] = e(h_l)
+			mat H[2,`count'] = e(h_r)
+			mat sampsis[1,`count'] = e(N_h_l)
+			mat sampsis[2,`count'] = e(N_h_r)
+			mat pv_rb[1,`count'] = e(pv_rb)
+			
+			if `count_ok'==1{				
+				mat sampsis_aux = (e(N_h_l) \ e(N_h_r))
+			}
+			else{
+				mat sampsis_aux = (sampsis_aux[1,1..colsof(sampsis_aux)],e(N_h_l) \ sampsis_aux[2,1..colsof(sampsis_aux)],e(N_h_r))
+			}
+			
+			local ++count_ok			
+		}
 		
 		local ++count
 	}
-	
+
 	* Compute weights
 		
 	mata: st_matrix("weights",colsum(st_matrix("sampsis")[,1..cols(st_matrix("sampsis"))-2])/sum(colsum(st_matrix("sampsis")[,1..cols(st_matrix("sampsis"))-2])))
+	mata: st_matrix("weights_aux",colsum(st_matrix("sampsis_aux")[,1..cols(st_matrix("sampsis_aux"))])/sum(colsum(st_matrix("sampsis_aux")[,1..cols(st_matrix("sampsis_aux"))])))
 	
 	* Compute weighted average of cutoff-specific effects
 	
-	mata: st_numscalar("tweight",st_matrix("coefs")[1,1..cols(st_matrix("coefs"))-2]*st_matrix("weights")')
-	mata: st_numscalar("tweight_bc",st_matrix("`b'")[1,1..cols(st_matrix("`b'"))-2]*st_matrix("weights")')
-	mata: st_numscalar("Vweight_bc",(st_matrix("weights"):^2)*diagonal(st_matrix("`V'")[1..rows(st_matrix("`V'"))-2,1..cols(st_matrix("`V'"))-2]))	
-	mata: st_numscalar("Nweight_l",rowsum(st_matrix("sampsis")[1,1..cols(st_matrix("sampsis"))-2]))
-	mata: st_numscalar("Nweight_r",rowsum(st_matrix("sampsis")[2,1..cols(st_matrix("sampsis"))-2]))
+	mata: varmat_aux_weight = st_matrix("Vdiag")
+	mata: varmat_weight = diag(varmat_aux_weight)
+	mata: st_matrix("Vmat_aux_weight",varmat_weight)
+	
+	mata: st_numscalar("tweight",st_matrix("coefs_aux")[1,1..cols(st_matrix("coefs_aux"))]*st_matrix("weights_aux")')
+	mata: st_numscalar("tweight_bc",st_matrix("`b'")[1,1..cols(st_matrix("`b'"))]*st_matrix("weights_aux")')
+	mata: st_numscalar("Vweight_bc",(st_matrix("weights_aux"):^2)*diagonal(st_matrix("Vmat_aux_weight")[1..rows(st_matrix("Vmat_aux_weight")),1..cols(st_matrix("Vmat_aux_weight"))]))	
+	mata: st_numscalar("Nweight_l",rowsum(st_matrix("sampsis_aux")[1,1..cols(st_matrix("sampsis_aux"))]))
+	mata: st_numscalar("Nweight_r",rowsum(st_matrix("sampsis_aux")[2,1..cols(st_matrix("sampsis_aux"))]))
 
 	local tstat_weight = tweight_bc/sqrt(Vweight_bc)
 	local pval_weight = 2*(1-normal(abs(`tstat_weight')))
 	local ci_l_weight = tweight_bc - invnormal(1-(1-`level'/100)/2)*sqrt(Vweight_bc)
 	local ci_r_weight = tweight_bc + invnormal(1-(1-`level'/100)/2)*sqrt(Vweight_bc)
+
+	mat `b'= (`b',tweight_bc)
+	mat Vdiag = (Vdiag,Vweight_bc)
 	
-	mat `b'[1,`n_cutoffs'+1] = tweight_bc
-	mat `V'[`n_cutoffs'+1,`n_cutoffs'+1] = Vweight_bc
 	mat coefs[1,`n_cutoffs'+1] = tweight
 	mat CI_rb[1,`n_cutoffs'+1] = `ci_l_weight'
 	mat CI_rb[2,`n_cutoffs'+1] = `ci_r_weight'
@@ -530,7 +567,19 @@ program define rdmc, eclass sortpreserve
 	mat sampsis[2,`n_cutoffs'+1] = Nweight_r
 	mat pv_rb[1,`n_cutoffs'+1] = `pval_weight'
 	
+	* Add pooled values to ereturn matrices
 	
+	mat `b'= (`b',`tau_bc_pooled')
+	mat Vdiag = (Vdiag,`V_bc_pooled')
+	
+	* Build V ereturn matrix
+	
+	mata: varmat_aux = st_matrix("Vdiag")
+	mata: varmat = diag(varmat_aux)
+	mata: st_matrix("Vmat_aux",varmat)
+	mat `V' = Vmat_aux
+	
+
 ********************************************************************************
 ** Display results
 ********************************************************************************
@@ -557,6 +606,11 @@ program define rdmc, eclass sortpreserve
 	
 	if "`covsvar'" != ""{
 		di as text "Covariate-adjusted estimates."
+	}
+	
+	if `count_fail>0'{
+		di as error "Warning: rdrobust could not run in one or more cutoffs."
+		di as error "See {stata matlist e(c_failed)} for details."
 	}
 	
 	
@@ -610,7 +664,7 @@ program define rdmc, eclass sortpreserve
 		drop _aux_*
 	}
 	
-	
+
 ********************************************************************************	
 ** Return values
 ********************************************************************************
@@ -618,8 +672,9 @@ program define rdmc, eclass sortpreserve
 	matname weights `colname', columns(.) explicit
 
 	local colname "`colname' weighted pooled"
-	
-	matname `b' `colname', columns(.) explicit
+	local colname_aux "`colname_aux' weighted pooled"
+
+	matname `b' `colname_aux', columns(.) explicit
 	matname coefs `colname', columns(.) explicit
 	matname sampsis `colname', columns(.) explicit
 	matname sampsis "left right", rows(.) explicit
@@ -627,8 +682,8 @@ program define rdmc, eclass sortpreserve
 	matname H "left right", rows(.) explicit
 	matname CI_rb `colname', columns(.) explicit
 	matname pv_rb `colname', columns(.) explicit
-
-	matname `V' `colname', explicit
+	
+	matname `V' `colname_aux', explicit
 	
 	ereturn post `b' `V'
 	
@@ -648,6 +703,10 @@ program define rdmc, eclass sortpreserve
 	ereturn scalar h_r = H[2,`n_cutoffs'+2]
 	ereturn scalar N_h_r_pool = sampsis[1,`n_cutoffs'+2]
 	ereturn scalar N_h_l_pool = sampsis[2,`n_cutoffs'+2]
+	
+	if `count_fail'>0{
+		ereturn matrix c_failed = c_failed	
+	}
 	
 	ereturn matrix sampsis = sampsis
 	ereturn matrix weights = weights

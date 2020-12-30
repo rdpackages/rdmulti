@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.6 2020-12-28}{...}
+{* *! version 0.6 2020-12-30}{...}
 {viewerjumpto "Syntax" "rdmc##syntax"}{...}
 {viewerjumpto "Description" "rdmc##description"}{...}
 {viewerjumpto "Options" "rdmc##options"}{...}
@@ -225,6 +225,7 @@ See {help rdrobust:rdrobust} for details.{p_end}
 {synopt:{cmd:e(H)}}vector of bandwidths at each side of each cutoff{p_end}
 {synopt:{cmd:e(weights)}}vector of weights for each cutoff-specific estimate{p_end}
 {synopt:{cmd:e(sampsis)}}vector of sample sizes at each side of each cutoff{p_end}
+{synopt:{cmd:e(c_failed)}}vector of cutoffs at which rdrobust encountered problems{p_end}
 
 
 {marker references}{...}

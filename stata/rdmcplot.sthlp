@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.6 2020-12-28}{...}
+{* *! version 0.6 2020-12-30}{...}
 {viewerjumpto "Syntax" "rdms##syntax"}{...}
 {viewerjumpto "Description" "rdms##description"}{...}
 {viewerjumpto "Options" "rdms##options"}{...}
@@ -149,7 +149,7 @@ See {help rdplot:rdplot} for details.{p_end}
 
 {p 4 8}{cmd:{opt xlineopt:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies options for the vertical lines indicating the cutoffs.{p_end}
 
-{p 4 8}{cmd:ci(}{it:cilevel}{cmd:)} adds confidence intervals of level {it:cilevel} to the plot.{p_end}
+{p 4 8}{cmd:ci(}{it:cilevel}{cmd:)} adds confidence intervals of level {it:cilevel} to the plot. Should be a number between 0 and 100 (e.g. {cmd:ci(95)} for 95% level).{p_end}
 
 {p 4 8}{cmd:nobins} omits the bins plot.{p_end}
 
@@ -194,6 +194,9 @@ See {help rdplot:rdplot} for details.{p_end}
 {p2col 5 20 24 2: Macros}{p_end}
 {synopt:{cmd:r(cvar)}}cutoff variable{p_end}
 {synopt:{cmd:r(clist)}}cutoff list{p_end}
+
+{p2col 5 20 24 2: Matrices}{p_end}
+{synopt:{cmd:r(c_failed)}}vector of cutoffs at which rdplot encountered problems{p_end}
 
 
 {marker references}{...}
