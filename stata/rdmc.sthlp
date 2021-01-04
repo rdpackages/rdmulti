@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.6 2020-12-30}{...}
+{* *! version 0.6 2021-01-04}{...}
 {viewerjumpto "Syntax" "rdmc##syntax"}{...}
 {viewerjumpto "Description" "rdmc##description"}{...}
 {viewerjumpto "Options" "rdmc##options"}{...}

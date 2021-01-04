@@ -1,6 +1,6 @@
 ********************************************************************************
 * RDMC: analysis of Regression Discontinuity Designs with multiple cutoffs
-* !version 0.6 2020-12-30
+* !version 0.6 2021-01-04
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
@@ -623,7 +623,7 @@ program define rdmc, eclass sortpreserve
 		capture drop _aux_*
 		tempvar aux_count aux_ci_l aux_ci_r aux_pooled aux_ci_l_w aux_ci_r_w aux_w aux_cutoffs aux_tag
 		
-		qui egen `aux_tag' = tag(`cvar')
+		qui egen `aux_tag' = tag(`cvar') if `touse'
 		qui gen `aux_cutoffs' = `cvar' if `aux_tag'==1
 		sort `aux_cutoffs'
 		

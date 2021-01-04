@@ -1,6 +1,6 @@
 ********************************************************************************
 * RDMCPLOT: Regression discontinuity plots with multiple cutoffs
-* !version 0.6 2020-12-30
+* !version 0.6 2021-01-04
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
