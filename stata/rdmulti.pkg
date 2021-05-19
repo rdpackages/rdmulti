@@ -1,11 +1,11 @@
-v 0.6
+v 0.7
 d STATA Package: RDMULTI
 d 
 d Authors: Matias D. Cattaneo, Department of Operations Research and Financial Engineering, Princeton University, cattaneo@princeton.edu
 d          Rocio Titiunik, Department of Politics, Princeton University, titiunik@princeton.edu
 d          Gonzalo Vazquez-Bare, Department of Economics, UC Santa Barbara, gvazquez@econ.ucsb.edu
 d
-d Date: 2021-01-04
+d Distribution-Date: 20210518
 d 
 f rdmc.ado
 f rdmc.sthlp

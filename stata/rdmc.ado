@@ -1,6 +1,6 @@
 ********************************************************************************
 * RDMC: analysis of Regression Discontinuity Designs with multiple cutoffs
-* !version 0.6 2021-01-04
+* !version 0.7 2021-05-18
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 

@@ -1,6 +1,6 @@
 ********************************************************************************
 * RDMCPLOT: Regression discontinuity plots with multiple cutoffs
-* !version 0.6 2021-01-04
+* !version 0.7 2021-05-18
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
@@ -419,7 +419,6 @@ program define rdmcplot, rclass
 				capture drop rdplot_*
 				capture rdplot `yvar' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `touse' `range_cond', c(`c') `p_opt' `nbins_opt' `covs_opt' `covseval_opt' `covsdrop_opt' `binselect_opt' ///
 					                                                                                 `scale_opt' `kernel_opt' `weights_opt' `h_opt' `support_opt' genvars hide
-
 				if _rc!=0{
 					if `count_fail'==0{
 						mat c_failed = J(1,1,`c')
@@ -433,7 +432,19 @@ program define rdmcplot, rclass
 					gen double `yhat_`i'' = rdplot_hat_y
 					gen double `ybar_`i'' = rdplot_mean_y	
 					gen double `xbar_`i'' = rdplot_mean_x
-
+					mat coef_l_`i' = e(coef_l)
+					mat coef_r_`i' = e(coef_r)
+					local p_aux = rowsof(coef_l_`i')-1
+					local coef_l_`i'_0 = coef_l_`i'[1, 1]
+					local coef_r_`i'_0 = coef_r_`i'[1, 1]
+					local eq_l_`i' "y = `coef_l_`i'_0'"
+					local eq_r_`i' "y = `coef_r_`i'_0'"
+					forvalues k = 1/`p_aux'{
+						local coef_l_`i'_`k' = coef_l_`i'[`k'+1, 1]
+						local coef_r_`i'_`k' = coef_r_`i'[`k'+1, 1]
+						local eq_l_`i' "`eq_l_`i'' + `coef_l_`i'_`k''*(x-`c')^`k'"
+						local eq_r_`i' "`eq_r_`i'' + `coef_r_`i'_`k''*(x-`c')^`k'"
+					}	
 					if "`genvars'" != ""{
 						gen double rdmcplot_hat_y_`i' = `yhat_`i''
 						gen double rdmcplot_mean_y_`i' = `ybar_`i''
@@ -444,7 +455,12 @@ program define rdmcplot, rclass
 						label variable rdmcplot_mean_x_`i' "Bin mean of x for c=`c'"
 					}
 					local scat_plots "`scat_plots' (scatter `ybar_`i'' `xbar_`i'', msize(small) mcolor(`color') `bins_opt')"
-					local line_plots "`line_plots' (line `yhat_`i'' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `treated'==1, sort lwidth(medthin) lcolor(`color') `line_opt')(line `yhat_`i'' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `treated'==0, sort lwidth(medthin) lcolor(`color') `line_opt')"
+					sum `xbar_`i'' if abs(`cvar'-`c')<=c(epsfloat) `range_cond' & `touse'					
+					local range_min = r(min)
+					local range_max = r(max)
+					local range_l_`i' = "`range_min' `c'"
+					local range_r_`i' = "`c' `range_max'"
+					local line_plots "`line_plots' (function `eq_r_`i'', range(`c' `range_max') lwidth(medthin) lcolor(`color') `line_opt')(function `eq_l_`i'', range(`range_min' `c') lwidth(medthin) lcolor(`color') `line_opt')"
 
 					if "`noxline'" == ""{
 						if "`xlineoptvar'" == ""{
@@ -464,7 +480,6 @@ program define rdmcplot, rclass
 				capture drop rdplot_*
 				capture rdplot `yvar' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `touse' `range_cond', c(`c') `p_opt' `nbins_opt' `covs_opt' `covseval_opt' `covsdrop_opt' `binselect_opt' ///
 					                                                                                 `scale_opt' `kernel_opt' `weights_opt' `h_opt' `support_opt' genvars hide ci(`ci')
-
 				if _rc!=0{
 					if `count_fail'==0{
 						mat c_failed = J(1,1,`c')
@@ -480,6 +495,19 @@ program define rdmcplot, rclass
 					gen double `xbar_`i'' = rdplot_mean_x
 					gen double `cileft_`i'' = rdplot_ci_l
 					gen double `ciright_`i'' = rdplot_ci_r 
+					mat coef_l_`i' = e(coef_l)
+					mat coef_r_`i' = e(coef_r)
+					local p_aux = rowsof(coef_l_`i')-1
+					local coef_l_`i'_0 = coef_l_`i'[1, 1]
+					local coef_r_`i'_0 = coef_r_`i'[1, 1]
+					local eq_l_`i' "y = `coef_l_`i'_0'"
+					local eq_r_`i' "y = `coef_r_`i'_0'"
+					forvalues k = 1/`p_aux'{
+						local coef_l_`i'_`k' = coef_l_`i'[`k'+1, 1]
+						local coef_r_`i'_`k' = coef_r_`i'[`k'+1, 1]
+						local eq_l_`i' "`eq_l_`i'' + `coef_l_`i'_`k''*(x-`c')^`k'"
+						local eq_r_`i' "`eq_r_`i'' + `coef_r_`i'_`k''*(x-`c')^`k'"
+					}
 					if "`genvars'" != ""{
 						qui gen double rdmcplot_hat_y_`i' = `yhat_`i''
 						qui gen double rdmcplot_mean_y_`i' = `ybar_`i''
@@ -494,8 +522,13 @@ program define rdmcplot, rclass
 						label variable rdmcplot_ci_r_`i' "Right CI for c=`c'"
 					}
 
-					local scat_plots "`scat_plots' (scatter `ybar_`i'' `xbar_`i'', msize(small) mcolor(`color') `bins_opt')"
-					local line_plots "`line_plots' (line `yhat_`i'' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `treated'==1, sort lwidth(medthin) lcolor(`color') `line_opt')(line `yhat_`i'' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `treated'==0, sort lwidth(medthin) lcolor(`color') `line_opt')"
+					local scat_plots "`scat_plots' (scatter `ybar_`i'' `xbar_`i'', msize(small) mcolor(`color') `bins_opt')"				
+					sum `xbar_`i'' if abs(`cvar'-`c')<=c(epsfloat) `range_cond' & `touse'
+					local range_min = r(min)
+					local range_max = r(max)
+					local range_l_`i' = "`range_min' `c'"
+					local range_r_`i' = "`c' `range_max'"
+					local line_plots "`line_plots' (function `eq_r_`i'', range(`c' `range_max') lwidth(medthin) lcolor(`color') `line_opt')(function `eq_l_`i'', range(`range_min' `c') lwidth(medthin) lcolor(`color') `line_opt')"
 					local ci_plots "`ci_plots' (rcap `cileft_`i'' `ciright_`i'' `xbar_`i'', lcolor(`color'))"
 
 					if "`noxline'" == ""{
@@ -512,8 +545,7 @@ program define rdmcplot, rclass
 
 		local ++i
 	}
-	
-	
+
 ********************************************************************************
 ** Plot
 ********************************************************************************
@@ -544,6 +576,13 @@ program define rdmcplot, rclass
 	if `count_fail'>0{
 		return matrix c_failed = c_failed	
 	}	
+	
+	forvalues k=1/`n_cutoffs'{
+		return local range_l_`k' "`range_l_`k''"
+		return local range_r_`k' "`range_r_`k''"
+		return local eq_l_`k' "`eq_l_`k''"
+		return local eq_r_`k' "`eq_r_`k''"
+	}
 	ret local clist `clist'
 	ret local cvar `cvar'
 	ret scalar n_cutoffs = `n_cutoffs'

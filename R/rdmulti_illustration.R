@@ -1,7 +1,7 @@
 ###################################################################
 # rdmulti: analysis of RD designs with multiple cutoffs or scores
 # Illustration file
-# 30-Dic-2020
+# 11-May-2021
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
@@ -24,6 +24,19 @@ aux <- rdmc(Y,X,C,pooled_opt=paste('h=20','p=2',sep=','),verbose=TRUE)
 aux <- rdmc(Y,X,C,h=c(11,10))
 aux <- rdmc(Y,X,C,bwselect=c('msetwo','certwo'))
 
+## Add four covariates
+
+Z <- matrix(rnorm(4*length(Y)),ncol=4)
+
+# Including all covariates in each cutoff
+
+aux <- rdmc(Y,X,C,covs_mat=Z)
+
+# Use covariates Z1 and Z2 in cutoff 1, all four covariates in cutoff 2
+
+covlist <- list(c(1,2),seq(1,4,by=1))
+aux <- rdmc(Y,X,C,covs_mat=Z,covs_list=covlist)
+
 
 ###################################################################
 # Plots
@@ -32,6 +45,7 @@ aux <- rdmc(Y,X,C,bwselect=c('msetwo','certwo'))
 aux <- rdmcplot(Y,X,C)
 aux <- rdmcplot(Y,X,C,nobins=TRUE)
 aux <- rdmcplot(Y,X,C,h=c(11,12),pvec=c(1,1))
+aux <- rdmcplot(Y,X,C,covs_mat=Z,covs_list=covlist)
 
 
 ###################################################################
@@ -51,6 +65,18 @@ aux <- rdmc(Y,X,cutoff)
 
 aux <- rdmcplot(Y,X,cutoff)
 
+## Add four covariates
+
+Z <- matrix(rnorm(4*length(Y)),ncol=4)
+
+# Including all covariates in each cutoff
+
+aux <- rdms(Y,X,cvec,covs_mat=Z)
+
+# Use covariates Z1 and Z2 in cutoff 1, all four covariates in cutoff 2
+
+covlist <- list(c(1,2),seq(1,4,by=1))
+aux <- rdms(Y,X,cvec,covs_mat=Z,covs_list=covlist)
 
 ###################################################################
 # Bivariate score
@@ -69,3 +95,15 @@ aux <- rdms(Y,X1,cvec,X2,zvar,cvec2,h=c(15,13,17))
 xnorm <- apply(cbind(abs(50-X1),abs(50-X2)),1,min)*(2*zvar-1)
 aux <- rdms(Y,X1,cvec,X2,zvar,cvec2,xnorm=xnorm)
 
+## Add four covariates
+
+Z <- matrix(rnorm(4*length(Y)),ncol=4)
+
+# Including all covariates in each cutoff
+
+aux <- rdms(Y,X1,cvec,X2,zvar,cvec2,covs_mat=Z)
+
+# Use covariates Z1 and Z2 in cutoff 1, all four covariates in cutoff 2, covariates 1 and 3 in cutoff 3
+
+covlist <- list(c(1,2),seq(1,4,by=1),c(1,3))
+aux <- rdms(Y,X1,cvec,X2,zvar,cvec2,covs_mat=Z,covs_list=covlist)
