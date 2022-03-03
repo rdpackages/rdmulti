@@ -387,7 +387,7 @@ program define rdms, eclass sortpreserve
 		
 		forvalues c = 1/`n_cutoffs'{
 		
-			local cutoff_`c' = round(`cvar'[`c'],.001)
+			local cutoff_`c' = (`cvar'[`c'],.0001)
 		
 			tempvar xc_`c'
 			qui gen double `xc_`c'' = `xvar' - `cvar'[`c']
@@ -525,8 +525,8 @@ program define rdms, eclass sortpreserve
 		
 		forvalues c = 1/`n_cutoffs'{
 		
-			local cutoff_`c'_1 = round(`cvar'[`c'],.001)
-			local cutoff_`c'_2 = round(`cvar2'[`c'],.001)
+			local cutoff_`c'_1 = round(`cvar'[`c'],.0001)
+			local cutoff_`c'_2 = round(`cvar2'[`c'],.0001)
 			local cutoff_`c' = abbrev("(`cutoff_`c'_1',`cutoff_`c'_2')",15)
 		
 			* Calculate (Euclidean) distance to cutoff
