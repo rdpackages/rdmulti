@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.7 2021-05-18}{...}
+{* *! version 0.8 2022-06-20}{...}
 {viewerjumpto "Syntax" "rdmc##syntax"}{...}
 {viewerjumpto "Description" "rdmc##description"}{...}
 {viewerjumpto "Options" "rdmc##options"}{...}
@@ -160,13 +160,15 @@ See {help rdrobust:rdrobust} for details.{p_end}
 {p 4 8}{cmd:{opt stdvars:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies whether {it:depvar} and {it:runvar} are standardized.
 See {help rdrobust:rdrobust} for details.{p_end}
 
-{dlgtab:Variance-Covariance Estimation}
+{dlgtab:Variance-Covariance Estimation and Inference}
 
 {p 4 8}{cmd:{opt vce:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies the variance-covariance matrix estimation method for {cmd:rdrobust} to calculate cutoff-specific estimates.
 See {help rdrobust:rdrobust} for details.{p_end}
 
 {p 4 8}{cmd:level(}{it:#}{cmd:)} specifies the confidence level for confidence intervals.
 See {help rdrobust:rdrobust} for details.{p_end}
+
+{p 4 8}{cmd:verbose} displays conventional, instead of robust-bias corrected, p-values and confidence intervals.{p_end}
 
 {dlgtab:Plot}
 

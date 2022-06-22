@@ -1,0 +1,24 @@
+{
+    "id": "3F3D05EC",
+    "path": "~/Trabajos/Software/rdmulti/R/rdmulti/R/rdmulti_package.R",
+    "project_path": "R/rdmulti_package.R",
+    "type": "r_source",
+    "hash": "3584112430",
+    "contents": "",
+    "dirty": false,
+    "created": 1598203981431.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "cursorPosition": "32,2",
+        "scrollLine": "16"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1609354978,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1609354978,
+    "read_only": false,
+    "read_only_alternatives": []
+}

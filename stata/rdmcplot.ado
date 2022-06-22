@@ -1,8 +1,8 @@
 ********************************************************************************
 * RDMCPLOT: Regression discontinuity plots with multiple cutoffs
-* !version 0.7 2021-05-18
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
+*!version 0.8 2022-06-20
 
 capture program drop rdmcplot
 program define rdmcplot, rclass 
@@ -203,7 +203,7 @@ program define rdmcplot, rclass
 			exit 108
 		}
 		qui count if `weightsvar'!=""
-		local weightsvar = r(N)
+		local n_weightsvar = r(N)
 		if `n_weightsvar' != `n_cutoffs' {
 			di as error "length of weightsvar should equal number of cutoffs"
 			exit 125

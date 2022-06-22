@@ -1,8 +1,8 @@
 ********************************************************************************
 * RDMC: analysis of Regression Discontinuity Designs with multiple cutoffs
-* !version 0.7 2021-05-18
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
+*!version 0.8 2022-06-20
 
 capture program drop rdmc
 program define rdmc, eclass sortpreserve
@@ -14,7 +14,7 @@ program define rdmc, eclass sortpreserve
 														  WEIGHTSvar(string) BWSELECTvar(string) VCEvar(string) level(real 95) ///
 														  SCALEPARvar(string) SCALEREGULvar(string) fuzzy(string) ///
 														  MASSPOINTSvar(string) BWCHECKvar(string) BWRESTRICTvar(string) STDVARSvar(string) ///
-														  plot graph_opt(string) verbose]
+														  plot graph_opt(string) CONVentional verbose]
 
 	
 	
@@ -219,7 +219,7 @@ program define rdmc, eclass sortpreserve
 			exit 108
 		}
 		qui count if `weightsvar'!=""
-		local weightsvar = r(N)
+		local n_weightsvar = r(N)
 		if `n_weightsvar' != `n_cutoffs' {
 			di as error "lengths of weightsvar and cvar have to coincide"
 			exit 125
@@ -344,15 +344,25 @@ program define rdmc, eclass sortpreserve
 	
 	tempname b V
 	mat `b' = J(1,1,.)
-	mat Vdiag = J(1,1,0)
 	mat `V' = J(1,1,0)
+	
+	mat b_bc = J(1,1,.)
+	mat Vdiag_rb = J(1,1,0)
+	mat b_cl = J(1,1,.)
+	mat Vdiag_cl = J(1,1,0)
+	
 	
 	mat sampsis = J(2,`n_cutoffs'+2,.)
 	mat weights = J(1,`n_cutoffs',.)
 	mat coefs = J(1,`n_cutoffs'+2,.)
 	mat CI_rb = J(2,`n_cutoffs'+2,.)
+	mat CI_cl = J(2,`n_cutoffs'+2,.)
 	mat H = J(2,`n_cutoffs'+2,.)
+	mat B = J(2,`n_cutoffs'+2,.)
 	mat pv_rb = J(1,`n_cutoffs'+2,.)
+	mat pv_cl = J(1,`n_cutoffs'+2,.)
+	mat SE_rb = J(1,`n_cutoffs'+2,.)
+	mat SE_cl = J(1,`n_cutoffs'+2,.)
 	
 
 ********************************************************************************
@@ -369,14 +379,26 @@ program define rdmc, eclass sortpreserve
 	local tau_bc_pooled = e(tau_bc)
 	local V_bc_pooled = e(se_tau_rb)^2
 	
+	local se_rb_pooled_cl = e(se_tau_cl)
+	local tau_bc_pooled_cl = e(tau_cl)
+	local V_bc_pooled_cl = e(se_tau_cl)^2
+	
 	mat coefs[1,`n_cutoffs'+2] = e(tau_cl)
 	mat CI_rb[1,`n_cutoffs'+2] = e(ci_l_rb)
 	mat CI_rb[2,`n_cutoffs'+2] = e(ci_r_rb)
+	mat CI_cl[1,`n_cutoffs'+2] = e(ci_l_cl)
+	mat CI_cl[2,`n_cutoffs'+2] = e(ci_r_cl)
 	mat H[1,`n_cutoffs'+2] = e(h_l)
 	mat H[2,`n_cutoffs'+2] = e(h_r)
+	mat B[1,`n_cutoffs'+2] = e(b_l)
+	mat B[2,`n_cutoffs'+2] = e(b_r)
 	mat sampsis[1,`n_cutoffs'+2] = e(N_h_l)
 	mat sampsis[2,`n_cutoffs'+2] = e(N_h_r)
 	mat pv_rb[1,`n_cutoffs'+2] = e(pv_rb)
+	mat pv_cl[1,`n_cutoffs'+2] = e(pv_cl)
+	mat SE_rb[1,`n_cutoffs'+2] = e(se_tau_rb)
+	mat SE_cl[1,`n_cutoffs'+2] = e(se_tau_cl)
+	
 
 	
 ********************************************************************************	
@@ -503,24 +525,35 @@ program define rdmc, eclass sortpreserve
 			local colname_aux "`colname_aux' c`count'"
 
 			if `count_ok'==1{				
-				mat `b' = e(tau_bc)
+				mat b_bc = e(tau_bc)
 				mat coefs_aux = e(tau_cl)
 				mat Vdiag = e(se_tau_rb)^2
+				mat b_cl = e(tau_cl)
+				mat Vdiag_cl = e(se_tau_cl)^2
 			}
 			else{
-				mat `b'= (`b',e(tau_bc))
-				mat coefs_aux= (coefs_aux,e(tau_bc))
-				mat Vdiag = (Vdiag,e(se_tau_rb)^2)			
+				mat b_bc= (b_bc,e(tau_bc))
+				mat coefs_aux= (coefs_aux,e(tau_cl))
+				mat Vdiag = (Vdiag,e(se_tau_rb)^2)
+				mat b_cl= (b_cl,e(tau_cl))
+				mat Vdiag_cl = (Vdiag_cl,e(se_tau_cl)^2)
 			}		
 			
 			mat coefs[1,`count'] = e(tau_cl)
 			mat CI_rb[1,`count'] = e(ci_l_rb)
 			mat CI_rb[2,`count'] = e(ci_r_rb)
+			mat CI_cl[1,`count'] = e(ci_l_cl)
+			mat CI_cl[2,`count'] = e(ci_r_cl)
 			mat H[1,`count'] = e(h_l)
 			mat H[2,`count'] = e(h_r)
+			mat B[1,`count'] = e(b_l)
+			mat B[2,`count'] = e(b_r)
 			mat sampsis[1,`count'] = e(N_h_l)
 			mat sampsis[2,`count'] = e(N_h_r)
 			mat pv_rb[1,`count'] = e(pv_rb)
+			mat pv_cl[1,`count'] = e(pv_cl)
+			mat SE_rb[1,`count'] = e(se_tau_rb)
+			mat SE_cl[1,`count'] = e(se_tau_cl)
 			
 			if `count_ok'==1{				
 				mat sampsis_aux = (e(N_h_l) \ e(N_h_r))
@@ -546,9 +579,16 @@ program define rdmc, eclass sortpreserve
 	mata: varmat_weight = diag(varmat_aux_weight)
 	mata: st_matrix("Vmat_aux_weight",varmat_weight)
 	
+	mata: varmat_aux_weight_cl = st_matrix("Vdiag_cl")
+	mata: varmat_weight_cl = diag(varmat_aux_weight_cl)
+	mata: st_matrix("Vmat_aux_weight_cl",varmat_weight_cl)
+	
 	mata: st_numscalar("tweight",st_matrix("coefs_aux")[1,1..cols(st_matrix("coefs_aux"))]*st_matrix("weights_aux")')
-	mata: st_numscalar("tweight_bc",st_matrix("`b'")[1,1..cols(st_matrix("`b'"))]*st_matrix("weights_aux")')
+	
+	mata: st_numscalar("tweight_bc",st_matrix("b_bc")[1,1..cols(st_matrix("b_bc"))]*st_matrix("weights_aux")')
 	mata: st_numscalar("Vweight_bc",(st_matrix("weights_aux"):^2)*diagonal(st_matrix("Vmat_aux_weight")[1..rows(st_matrix("Vmat_aux_weight")),1..cols(st_matrix("Vmat_aux_weight"))]))	
+	mata: st_numscalar("Vweight_cl",(st_matrix("weights_aux"):^2)*diagonal(st_matrix("Vmat_aux_weight_cl")[1..rows(st_matrix("Vmat_aux_weight_cl")),1..cols(st_matrix("Vmat_aux_weight_cl"))]))	
+	
 	mata: st_numscalar("Nweight_l",rowsum(st_matrix("sampsis_aux")[1,1..cols(st_matrix("sampsis_aux"))]))
 	mata: st_numscalar("Nweight_r",rowsum(st_matrix("sampsis_aux")[2,1..cols(st_matrix("sampsis_aux"))]))
 
@@ -556,47 +596,87 @@ program define rdmc, eclass sortpreserve
 	local pval_weight = 2*(1-normal(abs(`tstat_weight')))
 	local ci_l_weight = tweight_bc - invnormal(1-(1-`level'/100)/2)*sqrt(Vweight_bc)
 	local ci_r_weight = tweight_bc + invnormal(1-(1-`level'/100)/2)*sqrt(Vweight_bc)
+	
+	local tstat_weight_cl = tweight/sqrt(Vweight_cl)
+	local pval_weight_cl = 2*(1-normal(abs(`tstat_weight_cl')))
+	local ci_l_weight_cl = tweight - invnormal(1-(1-`level'/100)/2)*sqrt(Vweight_cl)
+	local ci_r_weight_cl = tweight + invnormal(1-(1-`level'/100)/2)*sqrt(Vweight_cl)
 
-	mat `b'= (`b',tweight_bc)
+	mat b_bc = (b_bc,tweight_bc)
 	mat Vdiag = (Vdiag,Vweight_bc)
+	mat b_cl = (b_cl,tweight)
+	mat Vdiag_cl = (Vdiag_cl,Vweight_cl)
 	
 	mat coefs[1,`n_cutoffs'+1] = tweight
 	mat CI_rb[1,`n_cutoffs'+1] = `ci_l_weight'
 	mat CI_rb[2,`n_cutoffs'+1] = `ci_r_weight'
+	mat CI_cl[1,`n_cutoffs'+1] = `ci_l_weight_cl'
+	mat CI_cl[2,`n_cutoffs'+1] = `ci_r_weight_cl'
 	mat sampsis[1,`n_cutoffs'+1] = Nweight_l
 	mat sampsis[2,`n_cutoffs'+1] = Nweight_r
 	mat pv_rb[1,`n_cutoffs'+1] = `pval_weight'
+	mat pv_cl[1,`n_cutoffs'+1] = `pval_weight_cl'
+
 	
 	* Add pooled values to ereturn matrices
 	
-	mat `b'= (`b',`tau_bc_pooled')
+	mat b_bc= (b_bc,`tau_bc_pooled')
 	mat Vdiag = (Vdiag,`V_bc_pooled')
-	
-	* Build V ereturn matrix
-	
-	mata: varmat_aux = st_matrix("Vdiag")
-	mata: varmat = diag(varmat_aux)
-	mata: st_matrix("Vmat_aux",varmat)
-	mat `V' = Vmat_aux
+	mat b_cl= (b_cl,`tau_bc_pooled_cl')
+	mat Vdiag_cl = (Vdiag_cl,`V_bc_pooled_cl')
 	
 
+********************************************************************************
+** Build b and V ereturn matrix
+********************************************************************************
+	
+	if "`conventional'"==""{	
+		mat `b' = b_bc
+		mata: varmat_aux = st_matrix("Vdiag")
+		mata: varmat = diag(varmat_aux)
+		mata: st_matrix("Vmat_aux",varmat)
+		mat `V' = Vmat_aux
+	}
+	else{
+		mat `b' = b_cl
+		mata: varmat_aux = st_matrix("Vdiag_cl")
+		mata: varmat = diag(varmat_aux)
+		mata: st_matrix("Vmat_aux",varmat)
+		mat `V' = Vmat_aux
+	}
+	
+	
 ********************************************************************************
 ** Display results
 ********************************************************************************
 
 	di _newline
-	di as text "Cutoff-specific RD estimation with robust bias-corrected inference"
+	
+	if "`conventional'"==""{
+		di as text "Cutoff-specific RD estimation with robust bias-corrected inference"	
+	}
+	else{
+		di as text "Cutoff-specific RD estimation with conventional inference"
+	}
+	
 	local count = 1
 	di as text "{hline 12}{c TT}{hline 67}"
 	di as text "{ralign 12:Cutoff}" as text _col(10) "{c |}"	_col(18) "Coef." 					_col(27) "P>|z|"  				_col(34)  "[`level'% Conf. Int.]"	_col(55) "hl" 	_col(62) "hr"		_col(70) "Nh"				_col(75) "Weight"
 	di as text "{hline 12}{c +}{hline 67}"
 
-	foreach c of local cutoff_list{
-
-		di as res %12.3f `c'  		as text _col(10) "{c |}"	as res	_col(13) %9.3f coefs[1,`count'] 		_col(20)  %8.2f pv_rb[1,`count']	_col(33) %8.2f CI_rb[1,`count'] %8.2f CI_rb[2,`count']				_col(51) %7.2f H[1,`count'] 			_col(58) %7.2f H[2,`count']			_col(66) %6.0f sampsis[1,`count']+sampsis[2,`count'] 				_col(72) %9.3f weights[1,`count']			
-		local ++count
-
+	if "`conventional'" == ""{
+		foreach c of local cutoff_list{
+			di as res %12.3f `c'  		as text _col(10) "{c |}"	as res	_col(13) %9.3f coefs[1,`count'] 		_col(20)  %8.2f pv_rb[1,`count']	_col(33) %8.2f CI_rb[1,`count'] %8.2f CI_rb[2,`count']				_col(51) %7.2f H[1,`count'] 			_col(58) %7.2f H[2,`count']			_col(66) %6.0f sampsis[1,`count']+sampsis[2,`count'] 				_col(72) %9.3f weights[1,`count']			
+			local ++count
+		}	
 	}
+	else{
+		foreach c of local cutoff_list{
+			di as res %12.3f `c'  		as text _col(10) "{c |}"	as res	_col(13) %9.3f coefs[1,`count'] 		_col(20)  %8.2f pv_cl[1,`count']	_col(33) %8.2f CI_cl[1,`count'] %8.2f CI_cl[2,`count']				_col(51) %7.2f H[1,`count'] 			_col(58) %7.2f H[2,`count']			_col(66) %6.0f sampsis[1,`count']+sampsis[2,`count'] 				_col(72) %9.3f weights[1,`count']			
+			local ++count
+		}
+	}
+	
 	
 	di as text "{hline 12}{c +}{hline 67}"
 	di as res "{ralign 12:Weighted}"  		as text _col(10) "{c |}"	as res	_col(13) %9.3f coefs[1,`n_cutoffs'+1]	_col(20)  %8.2f pv_rb[1,`n_cutoffs'+1]	_col(33) %8.2f CI_rb[1,`n_cutoffs'+1] %8.2f CI_rb[2,`n_cutoffs'+1] 	_col(51) %7.2f .					_col(58) %7.2f .					_col(66) %6.0f sampsis[1,`n_cutoffs'+1]+sampsis[2,`n_cutoffs'+1]	_col(80) "."				
@@ -630,12 +710,22 @@ program define rdmc, eclass sortpreserve
 		qui gen `aux_count' = _n in 1/`n_cutoffs'		
 		
 		* Plot coefficients
-				
-		qui gen `aux_ci_l' = CI_rb[1,`n_cutoffs'+2] in 1/`n_cutoffs'
-		qui gen `aux_ci_r' = CI_rb[2,`n_cutoffs'+2] in 1/`n_cutoffs'
+		
 		qui gen `aux_pooled' = coefs[1,`n_cutoffs'+2] in 1/`n_cutoffs'
-		qui gen `aux_ci_l_w' = CI_rb[1,`n_cutoffs'+1] in 1/`n_cutoffs'
-		qui gen `aux_ci_r_w' = CI_rb[2,`n_cutoffs'+1] in 1/`n_cutoffs'
+
+		if "`conventional'"==""{
+			qui gen `aux_ci_l' = CI_rb[1,`n_cutoffs'+2] in 1/`n_cutoffs'
+			qui gen `aux_ci_r' = CI_rb[2,`n_cutoffs'+2] in 1/`n_cutoffs'
+			qui gen `aux_ci_l_w' = CI_rb[1,`n_cutoffs'+1] in 1/`n_cutoffs'
+			qui gen `aux_ci_r_w' = CI_rb[2,`n_cutoffs'+1] in 1/`n_cutoffs'	
+		}
+		else{
+			qui gen `aux_ci_l' = CI_cl[1,`n_cutoffs'+2] in 1/`n_cutoffs'
+			qui gen `aux_ci_r' = CI_cl[2,`n_cutoffs'+2] in 1/`n_cutoffs'
+			qui gen `aux_ci_l_w' = CI_cl[1,`n_cutoffs'+1] in 1/`n_cutoffs'
+			qui gen `aux_ci_r_w' = CI_cl[2,`n_cutoffs'+1] in 1/`n_cutoffs'
+		}
+		
 		qui gen `aux_w' = coefs[1,`n_cutoffs'+1] in 1/`n_cutoffs'
 		mat Ct = coefs[1,2...]
 		mat Ct = Ct'
@@ -710,8 +800,13 @@ program define rdmc, eclass sortpreserve
 	
 	ereturn matrix sampsis = sampsis
 	ereturn matrix weights = weights
+	ereturn matrix B = B
 	ereturn matrix H = H
+	ereturn matrix SE_cl = SE_cl
+	ereturn matrix SE_rb = SE_rb
+	ereturn matrix CI_cl = CI_cl
 	ereturn matrix CI_rb = CI_rb
+	ereturn matrix pv_cl = pv_cl
 	ereturn matrix pv_rb = pv_rb
 	ereturn matrix coefs = coefs
 	

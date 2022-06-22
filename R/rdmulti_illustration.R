@@ -1,7 +1,7 @@
 ###################################################################
 # rdmulti: analysis of RD designs with multiple cutoffs or scores
 # Illustration file
-# 11-May-2021
+# 20-Jun-2022
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
@@ -36,6 +36,11 @@ aux <- rdmc(Y,X,C,covs_mat=Z)
 
 covlist <- list(c(1,2),seq(1,4,by=1))
 aux <- rdmc(Y,X,C,covs_mat=Z,covs_list=covlist)
+
+# Add weights
+
+wvar <- runif(length(Y),0.8,1.2)
+aux <- rdmc(Y,X,C,weightsvec=rep("wvar",2))
 
 
 ###################################################################

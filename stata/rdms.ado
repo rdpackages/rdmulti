@@ -1,8 +1,8 @@
 ********************************************************************************
 * RDMS: analysis of Regression Discontinuity Designs with multiple scores
-* !version 0.7 2021-05-18
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
+*!version 0.8 2022-06-20
 
 capture program drop rdms
 program define rdms, eclass sortpreserve
@@ -14,7 +14,7 @@ program define rdms, eclass sortpreserve
 														  WEIGHTSvar(string) BWSELECTvar(string) VCEvar(string) level(real 95) ///
 														  SCALEPARvar(string) SCALEREGULvar(string) fuzzy(string) ///
 														  MASSPOINTSvar(string) BWCHECKvar(string) BWRESTRICTvar(string) STDVARSvar(string) ///
-														  plot graph_opt(string)]
+														  plot graph_opt(string) CONVentional]
 
 	
 ********************************************************************************
@@ -234,7 +234,7 @@ program define rdms, eclass sortpreserve
 			exit 108
 		}
 		qui count if `weightsvar'!=""
-		local weightsvar = r(N)
+		local n_weightsvar = r(N)
 		if `n_weightsvar' != `n_cutoffs' {
 			di as error "lengths of weightsvar and cvar have to coincide"
 			exit 125
@@ -362,20 +362,38 @@ program define rdms, eclass sortpreserve
 	if "`xnorm'"==""{
 		mat `b' = J(1,`n_cutoffs',.)
 		mat `V' = J(`n_cutoffs',`n_cutoffs',0)
+		mat b_bc = J(1,`n_cutoffs',.)
+		mat V_rb = J(`n_cutoffs',`n_cutoffs',0)
+		mat b_cl = J(1,`n_cutoffs',.)
+		mat V_cl = J(`n_cutoffs',`n_cutoffs',0)
 		mat sampsis = J(2,`n_cutoffs',.)
 		mat coefs = J(1,`n_cutoffs',.)
 		mat CI_rb = J(2,`n_cutoffs',.)
+		mat CI_cl = J(2,`n_cutoffs',.)
 		mat H = J(2,`n_cutoffs',.)
+		mat B = J(2,`n_cutoffs',.)
 		mat pv_rb = J(1,`n_cutoffs',.)
+		mat pv_cl = J(1,`n_cutoffs',.)
+		mat SE_rb = J(1,`n_cutoffs',.)
+		mat SE_cl = J(1,`n_cutoffs',.)
 	} 
 	else {
 		mat `b' = J(1,`n_cutoffs'+1,.)
 		mat `V' = J(`n_cutoffs'+1,`n_cutoffs'+1,0)
+		mat b_bc = J(1,`n_cutoffs'+1,.)
+		mat V_rb = J(`n_cutoffs'+1,`n_cutoffs'+1,0)
+		mat b_cl = J(1,`n_cutoffs'+1,.)
+		mat V_cl = J(`n_cutoffs'+1,`n_cutoffs'+1,0)
 		mat sampsis = J(2,`n_cutoffs'+1,.)
 		mat coefs = J(1,`n_cutoffs'+1,.)
 		mat CI_rb = J(2,`n_cutoffs'+1,.)	
+		mat CI_cl= J(2,`n_cutoffs'+1,.)	
 		mat H = J(2,`n_cutoffs'+1,.)
+		mat B = J(2,`n_cutoffs'+1,.)
 		mat pv_rb = J(1,`n_cutoffs'+1,.)
+		mat pv_cl = J(1,`n_cutoffs'+1,.)
+		mat SE_rb = J(1,`n_cutoffs'+1,.)
+		mat SE_cl = J(1,`n_cutoffs'+1,.)
 	}
 
 
@@ -507,16 +525,25 @@ program define rdms, eclass sortpreserve
 			
 			local colname "`colname' c`c'"
 			
-			mat `b'[1,`c'] = e(tau_bc)
-			mat `V'[`c',`c'] = e(se_tau_rb)^2
+			mat b_bc[1,`c'] = e(tau_bc)
+			mat V_rb[`c',`c'] = e(se_tau_rb)^2
+			mat b_cl[1,`c'] = e(tau_cl)
+			mat V_cl[`c',`c'] = e(se_tau_cl)^2
 			mat coefs[1,`c'] = e(tau_cl)
 			mat CI_rb[1,`c'] = e(ci_l_rb)
 			mat CI_rb[2,`c'] = e(ci_r_rb)
+			mat CI_cl[1,`c'] = e(ci_l_cl)
+			mat CI_cl[2,`c'] = e(ci_r_cl)
 			mat sampsis[1,`c'] = e(N_h_l)
 			mat sampsis[2,`c'] = e(N_h_r)
 			mat H[1,`c'] = e(h_l)
 			mat H[2,`c'] = e(h_r)
 			mat pv_rb[1,`c'] = e(pv_rb)
+			mat pv_cl[1,`c'] = e(pv_cl)
+			mat B[1,`c'] = e(b_l)
+			mat B[2,`c'] = e(b_r)
+			mat SE_rb[1,`c'] = e(se_tau_rb)
+			mat SE_cl[1,`c'] = e(se_tau_cl)
 
 		}
 	}
@@ -587,7 +614,7 @@ program define rdms, eclass sortpreserve
 			
 			if "`weightsvar'"!=""{
 				local weights = `weightsvar'[`c']
-				local weights_opt "weights(`weights')"
+				local weights_opt "weights(`weights')"	
 			}
 			
 			if "`bwselectvar'"!=""{
@@ -609,10 +636,30 @@ program define rdms, eclass sortpreserve
 				local scaleregul = `scaleregulvar'[`c']
 				local scaleregul_opt "scaleregul(`scaleregul')"
 			}
+			
+			if "`masspointsvar'"!=""{
+				local masspoints = `masspointsvar'[`count']
+				local masspoints_opt "masspoints(`masspoints')"
+			}
+		
+			if "`bwcheckvar'"!=""{
+				local bwcheck = `bwcheckvar'[`count']
+				local bwcheck_opt "bwcheck(`bwcheck')"
+			}
+		
+			if "`bwrestrictvar'"!=""{
+				local bwrestrict = `bwrestrict'[`count']
+				local bwrestrict_opt "bwrestrict(`bwrestrict')"
+			}
+		
+			if "`stdvarsvar'"!=""{
+				local stdvars = `stdvars'[`count']
+				local stdvars_opt "stdvars(`stdvars')"
+			}		
 
-			qui rdrobust `yvar' `xc_`c'' if -`range_c'[`c']<=`xc_`c'' & `xc_`c''<=`range_t'[`c'] & `touse', `deriv_opt' `p_opt' `q_opt' `h_opt' `b_opt' `rho_opt' `covs_opt' ///
-																											`k_opt' `weights_opt' `bwselect_opt' `vce_opt' `scalepar_opt' `scaleregul_opt' ///
-																											`fuzzy_opt'  level(`level')
+			qui rdrobust `yvar' `xc_`c'' if -`range_c'[`c']<=`xc_`c'' & `xc_`c''<=`range_t'[`c'] & `touse', `deriv_opt' `p_opt' `q_opt' `h_opt' `b_opt' `rho_opt' `covs_opt' `covsdrop_opt' ///
+																										   `k_opt' `weights_opt' `bwselect_opt' `vce_opt' `scalepar_opt' `scaleregul_opt' ///
+																										   `fuzzy_opt'  level(`level') `masspoints_opt' `bwcheck_opt' `bwrestrict_opt' `stdvars_opt'
 			
 			local h_`c' = e(h_l)
 			local n_h_`c' = e(N_h_l) + e(N_h_r)
@@ -624,16 +671,25 @@ program define rdms, eclass sortpreserve
 			
 			local colname "`colname' c`c'"
 			
-			mat `b'[1,`c'] = e(tau_bc)
-			mat `V'[`c',`c'] = e(se_tau_rb)^2
+			mat b_bc[1,`c'] = e(tau_bc)
+			mat V_rb[`c',`c'] = e(se_tau_rb)^2
+			mat b_cl[1,`c'] = e(tau_cl)
+			mat V_cl[`c',`c'] = e(se_tau_cl)^2
 			mat coefs[1,`c'] = e(tau_cl)
 			mat CI_rb[1,`c'] = e(ci_l_rb)
 			mat CI_rb[2,`c'] = e(ci_r_rb)
+			mat CI_cl[1,`c'] = e(ci_l_cl)
+			mat CI_cl[2,`c'] = e(ci_r_cl)
 			mat sampsis[1,`c'] = e(N_h_l)
 			mat sampsis[2,`c'] = e(N_h_r)
 			mat H[1,`c'] = e(h_l)
 			mat H[2,`c'] = e(h_r)
 			mat pv_rb[1,`c'] = e(pv_rb)
+			mat pv_cl[1,`c'] = e(pv_cl)
+			mat B[1,`c'] = e(b_l)
+			mat B[2,`c'] = e(b_r)
+			mat SE_rb[1,`c'] = e(se_tau_rb)
+			mat SE_cl[1,`c'] = e(se_tau_cl)
 			
 			}
 		
@@ -649,10 +705,6 @@ program define rdms, eclass sortpreserve
 		qui rdrobust `yvar' `xnorm' if `touse', `pooled_opt'
 		
 		local tau_pooled = e(tau_cl)
-		local se_rb_pooled = e(se_tau_rb)
-		local pv_rb_pooled = e(pv_rb)
-		local ci_l_pooled = e(ci_l_rb)
-		local ci_r_pooled = e(ci_r_rb)
 		local h_l_pooled = e(h_l)
 		local h_r_pooled = e(h_r)
 		local N_l_pooled = e(N_l)
@@ -660,18 +712,51 @@ program define rdms, eclass sortpreserve
 		local N_eff_l_pooled = e(N_h_l)
 		local N_eff_r_pooled = e(N_h_r)
 		
+		if "`conventional'"==""{
+			local se_rb_pooled = e(se_tau_rb)
+			local pv_rb_pooled = e(pv_rb)
+			local ci_l_pooled = e(ci_l_rb)
+			local ci_r_pooled = e(ci_r_rb)
+		}
+		else{
+			local se_rb_pooled = e(se_tau_cl)
+			local pv_rb_pooled = e(pv_cl)
+			local ci_l_pooled = e(ci_l_cl)
+			local ci_r_pooled = e(ci_r_cl)
+		}
+		
 		local colname "`colname' pooled"
 		
-		mat `b'[1,`n_cutoffs'+1] = e(tau_bc)
-		mat `V'[`n_cutoffs'+1,`n_cutoffs'+1] = e(se_tau_rb)^2
+		mat b_bc[1,`n_cutoffs'+1] = e(tau_bc)
+		mat V_rb[`n_cutoffs'+1,`n_cutoffs'+1] = e(se_tau_rb)^2
+		mat b_cl[1,`n_cutoffs'+1] = e(tau_cl)
+		mat V_cl[`n_cutoffs'+1,`n_cutoffs'+1] = e(se_tau_cl)^2
 		mat coefs[1,`n_cutoffs'+1] = e(tau_cl)
 		mat CI_rb[1,`n_cutoffs'+1] = e(ci_l_rb)
 		mat CI_rb[2,`n_cutoffs'+1] = e(ci_r_rb)
+		mat CI_cl[1,`n_cutoffs'+1] = e(ci_l_cl)
+		mat CI_cl[2,`n_cutoffs'+1] = e(ci_r_cl)
 		mat sampsis[1,`n_cutoffs'+1] = e(N_h_l)
 		mat sampsis[2,`n_cutoffs'+1] = e(N_h_r)	
 		mat H[1,`n_cutoffs'+1] = e(h_l)
 		mat H[2,`n_cutoffs'+1] = e(h_r)	
 		mat pv_rb[1,`n_cutoffs'+1] = e(pv_rb)
+		mat pv_cl[1,`n_cutoffs'+1] = e(pv_cl)
+		mat SE_rb[1,`n_cutoffs'+1] = e(se_tau_rb)
+		mat SE_cl[1,`n_cutoffs'+1] = e(se_tau_cl)
+	}
+	
+********************************************************************************
+** Build b and V ereturn matrix
+********************************************************************************
+	
+	if "`conventional'"==""{	
+		mat `b' = b_bc
+		mat `V' = V_rb
+	}
+	else{
+		mat `b' = b_cl
+		mat `V' = V_cl
 	}
 	
 ********************************************************************************
@@ -679,30 +764,60 @@ program define rdms, eclass sortpreserve
 ********************************************************************************
 
 	di _newline
-	di as text "Cutoff-specific RD estimation with robust bias-corrected inference"
+	if "`conventional'"==""{
+		di as text "Cutoff-specific RD estimation with robust bias-corrected inference"	
+	}
+	else{
+		di as text "Cutoff-specific RD estimation with conventional inference"
+	}
 	di as text "{hline 15}{c TT}{hline 64}"
 	di as text "{ralign 15:Cutoff}" as text _col(14) "{c |}"	_col(23) "Coef." 					_col(33) "P>|z|"  				_col(43)  "[95% Conf. Int.]"	_col(64) "hl"	_col(71) "hr"	_col(79) "Nh"
 	di as text "{hline 15}{c +}{hline 64}"
 
-	if "`xvar2'"==""{
-		forvalues c = 1/`n_cutoffs'{
-			di as res %15.3f `cutoff_`c''	as text _col(14) "{c |}"	as res	_col(19) %9.3f coefs[1,`c'] 			_col(29)  %9.3f pv_rb[1,`c']			_col(40) %9.2f CI_rb[1,`c'] %9.2f CI_rb[2,`c']						_col(60) %7.2f H[1,`c'] %7.2f H[2,`c'] 						_col(75) %6.0f sampsis[1,`c']+sampsis[2,`c']
+	
+	if "`conventional'"==""{
+		if "`xvar2'"==""{
+			forvalues c = 1/`n_cutoffs'{
+				di as res %15.3f `cutoff_`c''	as text _col(14) "{c |}"	as res	_col(19) %9.3f coefs[1,`c'] 			_col(29)  %9.3f pv_rb[1,`c']			_col(40) %9.2f CI_rb[1,`c'] %9.2f CI_rb[2,`c']						_col(60) %7.2f H[1,`c'] %7.2f H[2,`c'] 						_col(75) %6.0f sampsis[1,`c']+sampsis[2,`c']
+			}
 		}
+		else{
+			forvalues c = 1/`n_cutoffs'{
+				di as res "{ralign 15: `cutoff_`c''}"	as text _col(14) "{c |}"	as res	_col(19) %9.3f coefs[1,`c'] 			_col(29)  %9.3f pv_rb[1,`c']			_col(40) %9.2f CI_rb[1,`c'] %9.2f CI_rb[2,`c']						_col(60) %7.2f H[1,`c'] %7.2f H[2,`c'] 						_col(75) %6.0f sampsis[1,`c']+sampsis[2,`c']
+			}
+		}
+
+		if "`xnorm'"!=""{
+			di as text "{hline 15}{c +}{hline 64}"
+			di as res "{ralign 15:Pooled}"  		as text _col(14) "{c |}"	as res	_col(19) %9.3f coefs[1,`n_cutoffs'+1] 	_col(29)  %9.3f pv_rb[1,`n_cutoffs'+1]	_col(40) %9.2f CI_rb[1,`n_cutoffs'+1] %9.2f CI_rb[2,`n_cutoffs'+1] 	_col(60) %7.2f H[1,`n_cutoffs'+1] %7.2f H[2,`n_cutoffs'+1] 	_col(75) %6.0f sampsis[1,`n_cutoffs'+1]+sampsis[2,`n_cutoffs'+1]
+			di as text "{hline 15}{c BT}{hline 64}"
+		}
+		else {
+			di as text "{hline 15}{c BT}{hline 64}"
+		}	
 	}
 	else{
-	  	forvalues c = 1/`n_cutoffs'{
-			di as res "{ralign 15: `cutoff_`c''}"	as text _col(14) "{c |}"	as res	_col(19) %9.3f coefs[1,`c'] 			_col(29)  %9.3f pv_rb[1,`c']			_col(40) %9.2f CI_rb[1,`c'] %9.2f CI_rb[2,`c']						_col(60) %7.2f H[1,`c'] %7.2f H[2,`c'] 						_col(75) %6.0f sampsis[1,`c']+sampsis[2,`c']
+		if "`xvar2'"==""{
+			forvalues c = 1/`n_cutoffs'{
+				di as res %15.3f `cutoff_`c''	as text _col(14) "{c |}"	as res	_col(19) %9.3f coefs[1,`c'] 			_col(29)  %9.3f pv_cl[1,`c']			_col(40) %9.2f CI_cl[1,`c'] %9.2f CI_cl[2,`c']						_col(60) %7.2f H[1,`c'] %7.2f H[2,`c'] 						_col(75) %6.0f sampsis[1,`c']+sampsis[2,`c']
+			}
+		}
+		else{
+			forvalues c = 1/`n_cutoffs'{
+				di as res "{ralign 15: `cutoff_`c''}"	as text _col(14) "{c |}"	as res	_col(19) %9.3f coefs[1,`c'] 			_col(29)  %9.3f pv_cl[1,`c']			_col(40) %9.2f CI_cl[1,`c'] %9.2f CI_cl[2,`c']						_col(60) %7.2f H[1,`c'] %7.2f H[2,`c'] 						_col(75) %6.0f sampsis[1,`c']+sampsis[2,`c']
+			}
+		}
+
+		if "`xnorm'"!=""{
+			di as text "{hline 15}{c +}{hline 64}"
+			di as res "{ralign 15:Pooled}"  		as text _col(14) "{c |}"	as res	_col(19) %9.3f coefs[1,`n_cutoffs'+1] 	_col(29)  %9.3f pv_cl[1,`n_cutoffs'+1]	_col(40) %9.2f CI_cl[1,`n_cutoffs'+1] %9.2f CI_cl[2,`n_cutoffs'+1] 	_col(60) %7.2f H[1,`n_cutoffs'+1] %7.2f H[2,`n_cutoffs'+1] 	_col(75) %6.0f sampsis[1,`n_cutoffs'+1]+sampsis[2,`n_cutoffs'+1]
+			di as text "{hline 15}{c BT}{hline 64}"
+		}
+		else {
+			di as text "{hline 15}{c BT}{hline 64}"
 		}
 	}
-		
-	if "`xnorm'"!=""{
-		di as text "{hline 15}{c +}{hline 64}"
-		di as res "{ralign 15:Pooled}"  		as text _col(14) "{c |}"	as res	_col(19) %9.3f coefs[1,`n_cutoffs'+1] 	_col(29)  %9.3f pv_rb[1,`n_cutoffs'+1]	_col(40) %9.2f CI_rb[1,`n_cutoffs'+1] %9.2f CI_rb[2,`n_cutoffs'+1] 	_col(60) %7.2f H[1,`n_cutoffs'+1] %7.2f H[2,`n_cutoffs'+1] 	_col(75) %6.0f sampsis[1,`n_cutoffs'+1]+sampsis[2,`n_cutoffs'+1]
-		di as text "{hline 15}{c BT}{hline 64}"
-	}
-	else {
-		di as text "{hline 15}{c BT}{hline 64}"
-	}
+	
 
 ********************************************************************************
 ** Plots
@@ -725,7 +840,14 @@ program define rdms, eclass sortpreserve
 			qui gen `aux_pooled' = `tau_pooled' in 1/`n_cutoffs'
 			mat Ct = coefs[1,2...]
 			mat Ct = Ct'
-			mat CIt = CI_rb[1...,2...]
+			
+			if "`conventional'"==""{
+				mat CIt = CI_rb[1...,2...]	
+			}
+			else{
+				mat CIt = CI_cl[1...,2...]
+			}
+			
 			mat CIt = CIt'
 			svmat Ct, names(_aux_coefs)
 			svmat CIt, names(_aux_ci)
@@ -779,8 +901,13 @@ program define rdms, eclass sortpreserve
 	ereturn post `b' `V'
 	
 	ereturn matrix sampsis = sampsis
+	ereturn matrix B = B
 	ereturn matrix H = H
+	ereturn matrix SE_cl = SE_cl
+	ereturn matrix SE_rb = SE_rb
+	ereturn matrix CI_cl = CI_cl
 	ereturn matrix CI_rb = CI_rb
+	ereturn matrix pv_cl = pv_cl
 	ereturn matrix pv_rb = pv_rb
 	ereturn matrix coefs = coefs
 	

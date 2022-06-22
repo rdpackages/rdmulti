@@ -1,7 +1,7 @@
 ###################################################################
 # rdmulti: analysis of RD designs with multiple cutoffs or scores
 # RDMCPLOT illustration file
-# 11-May-2020
+# 20-Jun-2022
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
@@ -42,7 +42,7 @@ aux$rdmc_plot
 # First cutoff: C=33
 
 rdmc_plot <- ggplot() + theme_bw() + labs(x="Running variable", y="Outcome")
-rdmc_plot <- rdmc_plot + geom_point(aes(x=Xmean[,1],y=Ymean[,1]),col="darkblue",shape=1,na.rm=TRUE) + 
+rdmc_plot <- rdmc_plot + geom_point(aes(x=Xmean[,1],y=Ymean[,1]),col="darkblue",shape=1,na.rm=TRUE) +
                          geom_line(aes(x=X0[,1],y=Yhat0[,1]),col="darkblue",linetype=1,na.rm=TRUE) +
                          geom_line(aes(x=X1[,1],y=Yhat1[,1]),col="darkblue",linetype=1,na.rm=TRUE) +
                          geom_vline(xintercept=33,col="darkblue",linetype=1)
@@ -50,7 +50,7 @@ rdmc_plot
 
 # Add second cutoff: C=66
 
-rdmc_plot <- rdmc_plot + geom_point(aes(x=Xmean[,2],y=Ymean[,2]),col="darkred",shape=1,na.rm=TRUE) + 
+rdmc_plot <- rdmc_plot + geom_point(aes(x=Xmean[,2],y=Ymean[,2]),col="darkred",shape=1,na.rm=TRUE) +
                          geom_line(aes(x=X0[,2],y=Yhat0[,2]),col="darkred",linetype=1,na.rm=TRUE) +
                          geom_line(aes(x=X1[,2],y=Yhat1[,2]),col="darkred",linetype=1,na.rm=TRUE) +
                          geom_vline(xintercept=66,col="darkred",linetype=1)
