@@ -25,7 +25,7 @@ install.packages('rdmulti')
 
 - Help: [R Manual](https://cran.r-project.org/web/packages/rdmulti/rdmulti.pdf), [CRAN repository](https://cran.r-project.org/package=rdmulti).
 
-- Replication: [R-script](R/rdmulti_illustration.R), [rdmcplot illustration](R/rdmcplot_illustration.R), [dataset1](stata/simdata_multic.csv), [dataset2](stata/simdata_cumul.csv), [dataset3](stata/simdata_multis.csv), [R illustration](R/rdmulti_illustration.pdf)
+- Replication: [R-script](R/rdmulti_illustration.R), [rdmcplot illustration](R/rdmcplot_illustration.R), [dataset1](R/simdata_multic.csv), [dataset2](R/simdata_cumul.csv), [dataset3](R/simdata_multis.csv), [R illustration](R/rdmulti_illustration.pdf)
 
 ## Stata Implementation
 
