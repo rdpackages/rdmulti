@@ -1,6 +1,6 @@
 ###################################################################
 # rdmulti: analysis of RD designs with multiple cutoffs or scores
-# !version 0.9 20-Jun-2022
+# !version 1.0 13-Jan-2023
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
@@ -31,9 +31,9 @@
 #'
 #' Cattaneo, M.D., L. Keele, R. Titiunik and G. Vazquez-Bare. (2016). \href{https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2016_JOP.pdf}{Interpreting Regression Discontinuity Designs with Multiple Cutoffs}. \emph{Journal of Politics} 78(4): 1229-1248.
 #'
-#' Cattaneo, M.D., L. Keele, R. Titiunik and G. Vazquez-Bare. (2020). \href{https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA.pdf}{Extrapolating Treatment Effects in Multi-Cutoff Regression Discontinuity Designs}. \emph{Journal of the American Statistical Association}, forthcoming.
+#' Cattaneo, M.D., L. Keele, R. Titiunik and G. Vazquez-Bare. (2020). \href{https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA.pdf}{Extrapolating Treatment Effects in Multi-Cutoff Regression Discontinuity Designs}. \emph{Journal of the American Statistical Association} 116(536): 1941, 1952.
 #'
-#' Cattaneo, M.D., R. Titiunik and G. Vazquez-Bare. (2020). \href{https://rdpackages.github.io/references/Cattaneo-Titiunik-VazquezBare_2020_Stata.pdf}{Analysis of Regression Discontinuity Designs with Multiple Cutoffs or Multiple Scores}. \emph{Stata Journal}, forthcoming.
+#' Cattaneo, M.D., R. Titiunik and G. Vazquez-Bare. (2020). \href{https://rdpackages.github.io/references/Cattaneo-Titiunik-VazquezBare_2020_Stata.pdf}{Analysis of Regression Discontinuity Designs with Multiple Cutoffs or Multiple Scores}. \emph{Stata Journal} 20(4): 866-891.
 #'
 #' Keele, L. and R. Titiunik. (2015). \href{https://rdpackages.github.io/references/Keele-Titiunik_2015_PA.pdf}{Geographic Boundaries as Regression Discontinuities}. \emph{Political Analysis} 23(1): 127-155
 #'

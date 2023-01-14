@@ -1,6 +1,6 @@
 ###################################################################
 # rdmc: analysis of RD designs with multiple cutoffs
-# !version 0.9 20-June-2022
+# !version 1.0 13-Jan-2023
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
@@ -251,7 +251,8 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
                                       level=level),
                    silent=TRUE)
 
-    if (!inherits(rdr.tmp,"try-error")){
+    #if (class(rdr.tmp)!="try-error"){
+    if (!inherits(rdr.tmp,'try-error')){
       B[1,count] <- rdr.tmp$Estimate[2]
       V[1,count] <- rdr.tmp$se[3]^2
       Coefs[1,count] <- rdr.tmp$Estimate[1]

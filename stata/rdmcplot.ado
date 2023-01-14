@@ -1,8 +1,8 @@
 ********************************************************************************
 * RDMCPLOT: Regression discontinuity plots with multiple cutoffs
+* !version 0.9 2023-01-13
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
-*!version 0.8 2022-06-20
 
 capture program drop rdmcplot
 program define rdmcplot, rclass 

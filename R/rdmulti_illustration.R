@@ -1,7 +1,6 @@
 ###################################################################
 # rdmulti: analysis of RD designs with multiple cutoffs or scores
 # Illustration file
-# 20-Jun-2022
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 

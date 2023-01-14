@@ -1,8 +1,8 @@
 ********************************************************************************
 * RDMC: analysis of Regression Discontinuity Designs with multiple cutoffs
+* !version 0.9 2023-01-13
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
-*!version 0.8 2022-06-20
 
 capture program drop rdmc
 program define rdmc, eclass sortpreserve
@@ -53,7 +53,7 @@ program define rdmc, eclass sortpreserve
 	local n_cutoffs: word count `cutoff_list'
 	
 	if "`derivvar'"!=""{
-		capture confirm numeric variable `bvar'
+		capture confirm numeric variable `derivvar'
 		if _rc!=0 {
 			di as error "deriv variable has to be numeric"
 			exit 108
