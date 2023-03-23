@@ -202,6 +202,12 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
         covs_aux <- NULL
       }
 
+      if (!is.null(cluster)){
+        cc <- cluster[xc>=Rc[c,1] & xc<=Rc[c,2]]
+      } else {
+        cc <- NULL
+      }
+
       rdr.tmp <- rdrobust::rdrobust(yc,xc,
                                    fuzzy=fuzzy,
                                    deriv=derivvec[c],
@@ -223,7 +229,7 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
                                    stdvars=stdvarsvec[c],
                                    vce=vcevec[c],
                                    nnmatch=nnmatchvec[c],
-                                   cluster=cluster,
+                                   cluster=cc,
                                    level=level)
 
       B[1,c] <- rdr.tmp$Estimate[2]
@@ -270,6 +276,12 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
         covs_aux <- NULL
       }
 
+      if (!is.null(cluster)){
+        cc <- cluster[xc>=rangemat[c,1] & xc<=rangemat[c,2]]
+      } else {
+        cc <- NULL
+      }
+
       rdr.tmp <- rdrobust::rdrobust(yc,xc,
                                    fuzzy=fuzzy,
                                    deriv=derivvec[c],
@@ -291,7 +303,7 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
                                    stdvars=stdvarsvec[c],
                                    vce=vcevec[c],
                                    nnmatch=nnmatchvec[c],
-                                   cluster=cluster,
+                                   cluster=cc,
                                    level=level)
 
       B[1,c] <- rdr.tmp$Estimate[2]

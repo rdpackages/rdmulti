@@ -226,6 +226,12 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
       covs_aux <- NULL
     }
 
+    if (!is.null(cluster)){
+      cc <- cluster[abs(C-c)<=.Machine$double.eps]
+    } else {
+      cc <- NULL
+    }
+
     rdr.tmp <- try(rdrobust::rdrobust(yc,xc,
                                       fuzzy=fuzzy,
                                       deriv=derivvec[count],
@@ -247,7 +253,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
                                       stdvars=stdvarsvec[count],
                                       vce=vcevec[count],
                                       nnmatch=nnmatchvec[count],
-                                      cluster=cluster,
+                                      cluster=cc,
                                       level=level),
                    silent=TRUE)
 
