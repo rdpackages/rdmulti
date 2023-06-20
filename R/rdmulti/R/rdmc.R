@@ -1,6 +1,6 @@
 ###################################################################
 # rdmc: analysis of RD designs with multiple cutoffs
-# !version 1.0 13-Jan-2023
+# !version 1.1 20-Jun-2023
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
@@ -48,8 +48,8 @@
 #'   dropped at each cutoff. See \code{rdrobust()} for details.
 #' @param kernelvec vector of cutoff-specific kernels. See \code{rdrobust()} for
 #'   details.
-#' @param weightsvec vector of cutoff-specific weights. See \code{rdrobust()}
-#'   for details.
+#' @param weightsvec vector of length equal to the number of cutoffs indicating
+#'   the names of the variables to be used as weights in each cutoff. See \code{rdrobust()} for details.
 #' @param bwselectvec vector of cutoff-specific bandwidth selection methods. See
 #'   \code{rdrobust()} for details.
 #' @param scaleparvec vector of cutoff-specific scale parameters. See
@@ -206,13 +206,18 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
 
     yc <- Y[abs(C-c)<=.Machine$double.eps]
     xc <- Xc[abs(C-c)<=.Machine$double.eps]
+    if (!is.null(cluster)){
+      cc <- cluster[abs(C-c)<=.Machine$double.eps]
+    } else {
+      cc <- NULL
+    }
 
     if (!is.null(weightsvec)){
       weightaux <- weightsvec[count]
       weightsc <- paste0("weightsc <- ",weightaux,"[abs(C-c)<=.Machine$double.eps]")
       weightsc <- eval(parse(text=weightsc))
     } else{
-      weightsc = NULL
+      weightsc <- NULL
     }
 
     if (!is.null(covs_mat)){
@@ -247,7 +252,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
                                       stdvars=stdvarsvec[count],
                                       vce=vcevec[count],
                                       nnmatch=nnmatchvec[count],
-                                      cluster=cluster,
+                                      cluster=cc,
                                       level=level),
                    silent=TRUE)
 

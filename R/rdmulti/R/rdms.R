@@ -1,6 +1,6 @@
 ###################################################################
 # rdms: analysis of RD designs with multiple scores
-# !version 1.0 13-Jan-2023
+# !version 1.1 20-Jun-2023
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
@@ -50,8 +50,8 @@
 #'   dropped at each cutoff. See \code{rdrobust()} for details.
 #' @param kernelvec vector of cutoff-specific kernels. See \code{rdrobust()} for
 #'   details.
-#' @param weightsvec vector of cutoff-specific weights. See \code{rdrobust()}
-#'   for details.
+#' @param weightsvec vector of length equal to the number of cutoffs indicating
+#'   the names of the variables to be used as weights in each cutoff. See \code{rdrobust()} for details.
 #' @param bwselectvec vector of cutoff-specific bandwidth selection methods. See
 #'   \code{rdrobust()} for details.
 #' @param scaleparvec vector of cutoff-specific scale parameters. See
@@ -183,12 +183,18 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
       yc <- Y[xc>=Rc[c,1] & xc<=Rc[c,2]]
       xc <- xc[xc>=Rc[c,1] & xc<=Rc[c,2]]
 
+      if (!is.null(cluster)){
+        cc <- cluster[xc>=Rc[c,1] & xc<=Rc[c,2]]
+      } else {
+        cc <- NULL
+      }
+
       if (!is.null(weightsvec)){
         weightaux <- weightsvec[c]
         weightsc <- paste0("weightsc <- ",weightaux,"[xc>=Rc[c,1] & xc<=Rc[c,2]]")
         weightsc <- eval(parse(text=weightsc))
       } else{
-        weightsc = NULL
+        weightsc <- NULL
       }
 
       if (!is.null(covs_mat)){
@@ -223,7 +229,7 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
                                    stdvars=stdvarsvec[c],
                                    vce=vcevec[c],
                                    nnmatch=nnmatchvec[c],
-                                   cluster=cluster,
+                                   cluster=cc,
                                    level=level)
 
       B[1,c] <- rdr.tmp$Estimate[2]
@@ -250,6 +256,12 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
 
       yc <- Y[xc>=rangemat[c,1] & xc<=rangemat[c,2]]
       xc <- xc[xc>=rangemat[c,1] & xc<=rangemat[c,2]]
+
+      if (!is.null(cluster)){
+        cc <- cluster[xc>=rangemat[c,1] & xc<=rangemat[c,2]]
+      } else {
+        cc <- NULL
+      }
 
       if (!is.null(weightsvec)){
         weightaux <- weightsvec[c]
@@ -291,7 +303,7 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
                                    stdvars=stdvarsvec[c],
                                    vce=vcevec[c],
                                    nnmatch=nnmatchvec[c],
-                                   cluster=cluster,
+                                   cluster=cc,
                                    level=level)
 
       B[1,c] <- rdr.tmp$Estimate[2]

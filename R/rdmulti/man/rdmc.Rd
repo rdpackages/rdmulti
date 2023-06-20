@@ -81,8 +81,8 @@ dropped at each cutoff. See \code{rdrobust()} for details.}
 \item{kernelvec}{vector of cutoff-specific kernels. See \code{rdrobust()} for
 details.}
 
-\item{weightsvec}{vector of cutoff-specific weights. See \code{rdrobust()}
-for details.}
+\item{weightsvec}{vector of length equal to the number of cutoffs indicating
+the names of the variables to be used as weights in each cutoff. See \code{rdrobust()} for details.}
 
 \item{bwselectvec}{vector of cutoff-specific bandwidth selection methods. See
 \code{rdrobust()} for details.}
