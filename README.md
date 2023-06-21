@@ -14,7 +14,14 @@ Please email: [rdpackages@googlegroups.com](mailto:rdpackages@googlegroups.com)
 
 ## Python Implementation
 
-Coming soon.
+To install/update in Python type:
+```
+pip install rdmulti
+```
+
+- Help: [PYPI repository](https://pypi.org/project/rdmulti/).
+
+- Replication: [py-script](python/rdmulti_illustration.py), [dataset1](python/simdata_multic.csv), [dataset2](python/simdata_cumul.csv), [dataset3](python/simdata_multis.csv)
 
 ## R Implementation
 
