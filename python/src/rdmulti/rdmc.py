@@ -200,31 +200,6 @@ def rdmc(Y,X,C,fuzzy=None,derivvec=None,pooled_opt=None,verbose=False,
             cc  = cluster[np.abs(C-c)<=epsilon]
         else:
             cc = None
-
-        rdr_tmp = rdrobust(yc,xc,
-                                fuzzy=fuzzy,
-                                deriv=derivvec[count],
-                                p=pvec[count],
-                                q=qvec[count],
-                                h=hmat[count],
-                                b=bmat[count],
-                                rho=rhovec[count],
-                                covs=covs_aux,
-                                covs_drop=covs_dropvec[count],
-                                kernel=kernelvec[count],
-                                weights=None,
-                                bwselect=bwselectvec[count],
-                                scalepar=scaleparvec[count],
-                                scaleregul=scaleregulvec[count],
-                                masspoints=masspointsvec[count],
-                                bwcheck=bwcheckvec[count],
-                                bwrestrict=bwrestrictvec[count],
-                                stdvars=stdvarsvec[count],
-                                vce=vcevec[count],
-                                nnmatch=nnmatchvec[count],
-                                cluster=cc,
-                                level=level)
-    
         try:
             rdr_tmp = rdrobust(yc,xc,
                                 fuzzy=fuzzy,

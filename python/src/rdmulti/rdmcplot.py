@@ -175,6 +175,21 @@ def rdmcplot(Y, X, C, nbinsmat=None, binselectvec=None, scalevec=None,
         else:
             covs_aux = None
 
+        rdplot(yc, xc, c=c,
+                        nbins=nbinsmat[count],
+                        binselect=binselectvec[count],
+                        scale=scalevec[count],
+                        support=supportmat[count],
+                        p=pvec[count],
+                        h=hmat[count],
+                        kernel=kernelvec[count],
+                        weights=weightsvec[count],
+                        covs=covs_aux,
+                        covs_eval=covs_evalvec[count],
+                        covs_drop=covs_dropvec[count],
+                        ci=ci,
+                        hide=True)
+
         try:
             aux = rdplot(yc, xc, c=c,
                         nbins=nbinsmat[count],
