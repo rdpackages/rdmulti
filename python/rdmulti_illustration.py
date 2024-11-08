@@ -13,7 +13,7 @@ from rdmulti import rdmc, rdms, rdmcplot
 # (in terminal) pip uninstall binsreg
 # import sys
 # import numpy as np
-# sys.path.insert(0, '/Users/rmasini/Dropbox/rdmulti/python/rdmulti/scr/rdmulti')
+# sys.path.insert(0, '/Dropbox/rdmulti/python/rdmulti/scr/rdmulti')
 # from rdmc import rdmc
 # from rdms import rdms
 # from rdmcplot import rdmcplot
@@ -68,7 +68,7 @@ aux = rdmcplot(Y, X, C, covs_mat=Z, covs_list=covlist)
 # Cumulative cutoffs
 ##################################################################
 
-data = pd.read_csv('/Users/rmasini/Dropbox/rdmulti/python/simdata_cumul.csv')
+data = pd.read_csv('simdata_cumul.csv')
 Y = data['y']
 X = data['x']
 cvec = np.array([data['c'][0], data['c'][1]])
@@ -96,7 +96,7 @@ covlist = [[0, 1], list(range(4))]
 aux = rdms(Y, X, cvec, covs_mat=Z, covs_list=covlist)
 
 # Bivariate score
-data = pd.read_csv('/Users/rmasini/Dropbox/rdmulti/python/simdata_multis.csv')
+data = pd.read_csv('simdata_multis.csv')
 Y = data['y']
 X1 = data['x1']
 X2 = data['x2']
