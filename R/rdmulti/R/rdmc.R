@@ -377,7 +377,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
     cat(format('Cutoff',  width=11))
     cat(format('Coef.',   width=8))
     cat(format('P-value', width=16))
-    cat(format('95% CI',  width=16))
+    cat(format(paste0(level, '% CI'), width=16))  # Updated line that allows to print the label using the value of the level parameter.
     cat(format('hl',      width=9))
     cat(format('hr',      width=9))
     cat(format('Nh',      width=5))
@@ -460,7 +460,8 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
     legend('bottomright',legend=c('Estimates','Weighted estimate','Pooled estimate'),pch=c(16,NA,NA),lty=c(NA,1,1),
            col=c('darkblue','darkred','gray34'),bty='n',cex=0.75)
 
-    mtext('Bars are 95% CIs for estimates. \nShaded area is the 95% CI for weighted and pooled.',cex=0.8)
+    # Update this line to use the `level` parameter
+    mtext(paste0('Bars are ', level, '% CIs for estimates. \nShaded area is the ', level, '% CI for weighted and pooled.'), cex = 0.8)
 
     barplot(W,xlab='Cutoff',ylab='Weight',names.arg=clist,space=1.5)
 
