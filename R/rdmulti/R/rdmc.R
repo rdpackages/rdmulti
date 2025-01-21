@@ -336,7 +336,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
 
     for (k in 1:cnum){
       cat(format(sprintf('%4.3f',clist[k]),        width=11))
-      cat(format(sprintf('%7.3f',Coefs[k]),        width=9))
+      cat(format(sprintf('%7.3f', B[k]), width = 9))  # Bias-corrected estimate because Coefs[k] provides the conventional estimate
       cat(format(sprintf('%1.3f',Pv[k]),           width=9))
       cat(format(sprintf('%4.3f',CI[1,k]),         width=10))
       cat(format(sprintf('%4.3f',CI[2,k]),         width=10))
@@ -349,7 +349,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
     cat(paste0(rep('-',80),collapse='')); cat('\n')
 
     cat(format('Weighted',                                 width=11))
-    cat(format(sprintf('%7.3f',Coefs[1,cnum+1]),           width=9))
+    cat(format(sprintf('%7.3f', B[1, cnum+1]), width = 9))  # Bias-corrected estimate because Coefs[1, cnum+1] provides the conventional estimate
     cat(format(sprintf('%1.3f',Pv[1,cnum+1]),              width=9))
     cat(format(sprintf('%4.3f',CI[1,cnum+1]),              width=10))
     cat(format(sprintf('%4.3f',CI[2,cnum+1]),              width=13))
@@ -360,7 +360,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
     cat('\n')
 
     cat(format('Pooled',                                   width=11))
-    cat(format(sprintf('%7.3f',Coefs[cnum+2]),             width=9))
+    cat(format(sprintf('%7.3f', B[1, cnum+2]), width = 9))  # Bias-corrected estimate because Coefs[1, cnum+2] provides the conventional estimate
     cat(format(sprintf('%1.3f',Pv[cnum+2]),                width=9))
     cat(format(sprintf('%4.3f',CI[1,cnum+2]),              width=10))
     cat(format(sprintf('%4.3f',CI[2,cnum+2]),              width=10))
