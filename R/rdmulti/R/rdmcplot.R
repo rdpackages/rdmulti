@@ -1,6 +1,6 @@
 ###################################################################
 # rdmcplot: RD plots with multiple cutoffs
-# !version 1.1 20-Jun-2023
+# !version 1.2 22-May-2025
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 

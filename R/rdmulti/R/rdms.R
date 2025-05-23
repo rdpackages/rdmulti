@@ -1,6 +1,6 @@
 ###################################################################
 # rdms: analysis of RD designs with multiple scores
-# !version 1.1 20-Jun-2023
+# !version 1.2 22-May-2025
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
@@ -356,13 +356,13 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
 
   cat('\n')
   cat(paste0(rep('=',80),collapse='')); cat('\n')
-  cat(format('Cutoff',  width=17))
-  cat(format('Coef.',   width=9))
-  cat(format('P-value', width=17))
-  cat(format('95% CI',  width=16))
-  cat(format('hl',      width=9))
-  cat(format('hr',      width=10))
-  cat(format('Nh',      width=10)); cat('\n')
+  cat(format('Cutoff',             width=17))
+  cat(format('Coef.',              width=9))
+  cat(format('P-value',            width=17))
+  cat(format(paste0(level,'% CI'), width=16))
+  cat(format('hl',                 width=9))
+  cat(format('hr',                 width=10))
+  cat(format('Nh',                 width=10)); cat('\n')
   cat(paste0(rep('=',80),collapse='')); cat('\n')
 
   if(conventional==FALSE){
@@ -403,9 +403,9 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
         cat(paste0('(',format(sprintf('%4.2f',C[k])),',',format(sprintf('%4.2f',C2[k])),format(')',width=5)))
       }
       cat(format(sprintf('%7.3f',Coefs[k]),        width=10))
-      cat(format(sprintf('%1.3f',Pv_cl[k]),           width=10))
-      cat(format(sprintf('%4.3f',CI_cl[1,k]),         width=10))
-      cat(format(sprintf('%4.3f',CI_cl[2,k]),         width=10))
+      cat(format(sprintf('%1.3f',Pv_cl[k]),        width=10))
+      cat(format(sprintf('%4.3f',CI_cl[1,k]),      width=10))
+      cat(format(sprintf('%4.3f',CI_cl[2,k]),      width=10))
       cat(format(sprintf('%4.3f',H[1,k]),          width=9))
       cat(format(sprintf('%4.3f',H[2,k]),          width=10))
       cat(format(sprintf('%4.0f',Nh[1,k]+Nh[2,k]), width=10))
@@ -416,9 +416,9 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
       cat(paste0(rep('-',80),collapse='')); cat('\n')
       cat(format('Pooled',                                   width=17))
       cat(format(sprintf('%7.3f',Coefs[cnum+1]),             width=10))
-      cat(format(sprintf('%1.3f',Pv_cl[cnum+1]),                width=10))
-      cat(format(sprintf('%4.3f',CI_cl[1,cnum+1]),              width=10))
-      cat(format(sprintf('%4.3f',CI_cl[2,cnum+1]),              width=10))
+      cat(format(sprintf('%1.3f',Pv_cl[cnum+1]),             width=10))
+      cat(format(sprintf('%4.3f',CI_cl[1,cnum+1]),           width=10))
+      cat(format(sprintf('%4.3f',CI_cl[2,cnum+1]),           width=10))
       cat(format(sprintf('%4.3f',H[1,cnum+1]),               width=9))
       cat(format(sprintf('%4.3f',H[2,cnum+1]),               width=10))
       cat(format(sprintf('%4.0f',Nh[1,cnum+1]+Nh[2,cnum+1]), width=10))

@@ -1,6 +1,6 @@
 ********************************************************************************
 * RDMS: analysis of Regression Discontinuity Designs with multiple scores
-* !version 0.9 2023-01-13
+* !version 1.0 2025-05-22
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
@@ -771,7 +771,7 @@ program define rdms, eclass sortpreserve
 		di as text "Cutoff-specific RD estimation with conventional inference"
 	}
 	di as text "{hline 15}{c TT}{hline 64}"
-	di as text "{ralign 15:Cutoff}" as text _col(14) "{c |}"	_col(23) "Coef." 					_col(33) "P>|z|"  				_col(43)  "[95% Conf. Int.]"	_col(64) "hl"	_col(71) "hr"	_col(79) "Nh"
+	di as text "{ralign 15:Cutoff}" as text _col(14) "{c |}"	_col(23) "Coef." 					_col(33) "P>|z|"  				_col(43)  "[`level'% Conf. Int.]"	_col(64) "hl"	_col(71) "hr"	_col(79) "Nh"
 	di as text "{hline 15}{c +}{hline 64}"
 
 	

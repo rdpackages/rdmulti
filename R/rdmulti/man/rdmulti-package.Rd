@@ -2,8 +2,8 @@
 % Please edit documentation in R/rdmulti_package.R
 \docType{package}
 \name{rdmulti-package}
+\alias{rdmulti}
 \alias{rdmulti-package}
-\alias{_PACKAGE}
 \alias{rdmulti_package}
 \title{rdmulti: analysis of RD Designs with multiple cutoffs or scores}
 \description{

@@ -1,6 +1,6 @@
 ###################################################################
 # rdmc: analysis of RD designs with multiple cutoffs
-# !version 1.1 20-Jun-2023
+# !version 1.2 22-May-2025
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
@@ -322,14 +322,14 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
     cat('\n')
     cat('Cutoff-specific RD estimation with robust bias-corrected inference'); cat('\n')
     cat(paste0(rep('=',80),collapse='')); cat('\n')
-    cat(format('Cutoff',  width=11))
-    cat(format('Coef.',   width=8))
-    cat(format('P-value', width=16))
-    cat(format('95% CI',  width=16))
-    cat(format('hl',      width=9))
-    cat(format('hr',      width=9))
-    cat(format('Nh',      width=5))
-    cat(format('Weight',  width=5))
+    cat(format('Cutoff',             width=11))
+    cat(format('Coef.',              width=8))
+    cat(format('P-value',            width=16))
+    cat(format(paste0(level,'% CI'), width=16))
+    cat(format('hl',                 width=9))
+    cat(format('hr',                 width=9))
+    cat(format('Nh',                 width=5))
+    cat(format('Weight',             width=5))
     cat('\n')
     cat(paste0(rep('=',80),collapse=''))
     cat('\n')
@@ -360,7 +360,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
     cat('\n')
 
     cat(format('Pooled',                                   width=11))
-    cat(format(sprintf('%7.3f',Coefs[cnum+2]),             width=9))
+    cat(format(sprintf('%7.3f',Coefs[1,cnum+2]),           width=9))
     cat(format(sprintf('%1.3f',Pv[cnum+2]),                width=9))
     cat(format(sprintf('%4.3f',CI[1,cnum+2]),              width=10))
     cat(format(sprintf('%4.3f',CI[2,cnum+2]),              width=10))
@@ -377,7 +377,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
     cat(format('Cutoff',  width=11))
     cat(format('Coef.',   width=8))
     cat(format('P-value', width=16))
-    cat(format('95% CI',  width=16))
+    cat(format(paste0(level, '% CI'), width=16))
     cat(format('hl',      width=9))
     cat(format('hr',      width=9))
     cat(format('Nh',      width=5))
@@ -389,9 +389,9 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
     for (k in 1:cnum){
       cat(format(sprintf('%4.3f',clist[k]),        width=11))
       cat(format(sprintf('%7.3f',Coefs[k]),        width=9))
-      cat(format(sprintf('%1.3f',Pv_cl[k]),           width=9))
-      cat(format(sprintf('%4.3f',CI_cl[1,k]),         width=10))
-      cat(format(sprintf('%4.3f',CI_cl[2,k]),         width=10))
+      cat(format(sprintf('%1.3f',Pv_cl[k]),        width=9))
+      cat(format(sprintf('%4.3f',CI_cl[1,k]),      width=10))
+      cat(format(sprintf('%4.3f',CI_cl[2,k]),      width=10))
       cat(format(sprintf('%4.3f',H[1,k]),          width=9))
       cat(format(sprintf('%4.3f',H[2,k]),          width=9))
       cat(format(sprintf('%4.0f',Nh[1,k]+Nh[2,k]), width=8))
@@ -402,9 +402,9 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
 
     cat(format('Weighted',                                 width=11))
     cat(format(sprintf('%7.3f',Coefs[1,cnum+1]),           width=9))
-    cat(format(sprintf('%1.3f',Pv_cl[1,cnum+1]),              width=9))
-    cat(format(sprintf('%4.3f',CI_cl[1,cnum+1]),              width=10))
-    cat(format(sprintf('%4.3f',CI_cl[2,cnum+1]),              width=13))
+    cat(format(sprintf('%1.3f',Pv_cl[1,cnum+1]),           width=9))
+    cat(format(sprintf('%4.3f',CI_cl[1,cnum+1]),           width=10))
+    cat(format(sprintf('%4.3f',CI_cl[2,cnum+1]),           width=13))
     cat(format('  .',                                      width=9))
     cat(format('  .',                                      width=6))
     cat(format(sprintf('%4.0f',Nh[1,cnum+1]+Nh[2,cnum+1]), width=11))
@@ -413,9 +413,9 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
 
     cat(format('Pooled',                                   width=11))
     cat(format(sprintf('%7.3f',Coefs[cnum+2]),             width=9))
-    cat(format(sprintf('%1.3f',Pv_cl[cnum+2]),                width=9))
-    cat(format(sprintf('%4.3f',CI_cl[1,cnum+2]),              width=10))
-    cat(format(sprintf('%4.3f',CI_cl[2,cnum+2]),              width=10))
+    cat(format(sprintf('%1.3f',Pv_cl[cnum+2]),             width=9))
+    cat(format(sprintf('%4.3f',CI_cl[1,cnum+2]),           width=10))
+    cat(format(sprintf('%4.3f',CI_cl[2,cnum+2]),           width=10))
     cat(format(sprintf('%4.3f',H[1,cnum+2]),               width=9))
     cat(format(sprintf('%4.3f',H[2,cnum+2]),               width=9))
     cat(format(sprintf('%4.0f',Nh[1,cnum+2]+Nh[2,cnum+2]), width=11))
@@ -460,7 +460,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
     legend('bottomright',legend=c('Estimates','Weighted estimate','Pooled estimate'),pch=c(16,NA,NA),lty=c(NA,1,1),
            col=c('darkblue','darkred','gray34'),bty='n',cex=0.75)
 
-    mtext('Bars are 95% CIs for estimates. \nShaded area is the 95% CI for weighted and pooled.',cex=0.8)
+    mtext(paste0('Bars are ', level, '% CIs for estimates. \nShaded area is the ', level, '% CI for weighted and pooled.'), cex = 0.8)
 
     barplot(W,xlab='Cutoff',ylab='Weight',names.arg=clist,space=1.5)
 
