@@ -1,19 +1,24 @@
 Package: rdmulti
 Type: Package
-Title: Analysis of RD Designs with Multiple Cutoffs or Scores
-Version: 1.2
+Title: Robust Local Polynomial Methods for RD Designs with Multiple Cutoffs or Multiple Scores
+Version: 2.0.0
+Date: 2026-05-15
 Authors@R: c(person(given = c("Matias", "D."),
                       family = "Cattaneo",
-                      role = "aut"),
+                      role = c("aut", "cre"),
+                      email = "matias.d.cattaneo@gmail.com"),
                person(given = "Rocio",
                       family = "Titiunik",
-                      role = "aut"),
+                      role = "aut",
+                      email = "rocio.titiunik@gmail.com"),
                person(given = "Gonzalo",
                       family = "Vazquez-Bare",
-                      role = c("aut", "cre"),
-                      email = "gvazquez@econ.ucsb.edu"))
-Description: The regression discontinuity (RD) design is a popular quasi-experimental design for causal inference and policy evaluation. The 'rdmulti' package provides tools to analyze RD designs with multiple cutoffs or scores: rdmc() estimates pooled and cutoff specific effects for multi-cutoff designs, rdmcplot() draws RD plots for multi-cutoff designs and rdms() estimates effects in cumulative cutoffs or multi-score designs. See Cattaneo, Titiunik and Vazquez-Bare (2020) <https://rdpackages.github.io/references/Cattaneo-Titiunik-VazquezBare_2020_Stata.pdf> for further methodological details. 
-Imports: ggplot2, rdrobust
-License: GPL-2
+                      role = "aut",
+                      email = "gvazquezbare@gmail.com"))
+Description: The 'rdmulti' package implements estimation, inference, and graphical procedures for regression discontinuity (RD) designs with multiple cutoffs or multiple scores. rdmc() provides point estimation and robust bias-corrected inference for multi-cutoff designs, rdmcplot() provides data-driven RD plots for multi-cutoff designs, and rdms() provides point estimation and robust bias-corrected inference for multi-score designs. See Cattaneo, Titiunik and Vazquez-Bare (2020) <https://rdpackages.github.io/references/Cattaneo-Titiunik-VazquezBare_2020_Stata.pdf> for further methodological details.
+Imports: ggplot2, rdrobust, rlang
+License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+URL: https://github.com/rdpackages/rdmulti
+BugReports: https://github.com/rdpackages/rdmulti/issues
+Config/roxygen2/version: 8.0.0

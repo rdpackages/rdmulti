@@ -2,7 +2,7 @@
 % Please edit documentation in R/rdmcplot.R
 \name{rdmcplot}
 \alias{rdmcplot}
-\title{RD plots with multiple cutoffs.}
+\title{Data-driven RD plots for multi-cutoff designs}
 \usage{
 rdmcplot(
   Y,
@@ -20,7 +20,10 @@ rdmcplot(
   covs_list = NULL,
   covs_evalvec = NULL,
   covs_dropvec = NULL,
+  ginv.tolvec = NULL,
+  masspointsvec = NULL,
   ci = NULL,
+  shade = FALSE,
   col_bins = NULL,
   pch_bins = NULL,
   col_poly = NULL,
@@ -30,7 +33,9 @@ rdmcplot(
   nobins = FALSE,
   nopoly = FALSE,
   noxline = FALSE,
-  nodraw = FALSE
+  nodraw = FALSE,
+  subset = NULL,
+  data = NULL
 )
 }
 \arguments{
@@ -75,8 +80,16 @@ covariates. See \code{rdrobust()} for details.}
 \item{covs_dropvec}{vector indicating whether collinear covariates should be
 dropped at each cutoff. See \code{rdrobust()} for details.}
 
+\item{ginv.tolvec}{vector of cutoff-specific tolerances for generalized
+inverse calculations. See \code{rdplot()} for details.}
+
+\item{masspointsvec}{vector indicating how to handle repeated values at each
+cutoff. See \code{rdplot()} for details.}
+
 \item{ci}{adds confidence intervals of the specified level to the plot. See
 \code{rdrobust()} for details.}
+
+\item{shade}{passes the shaded confidence interval option to \code{rdplot()}.}
 
 \item{col_bins}{vector of colors for bins.}
 
@@ -97,6 +110,10 @@ dropped at each cutoff. See \code{rdrobust()} for details.}
 \item{noxline}{omits vertical lines indicating the cutoffs.}
 
 \item{nodraw}{omits plot.}
+
+\item{subset}{optional subset of observations to use.}
+
+\item{data}{optional data frame for resolving string variable names.}
 }
 \value{
 \item{clist}{list of cutoffs}
@@ -112,7 +129,8 @@ dropped at each cutoff. See \code{rdrobust()} for details.}
 \item{cfail}{Cutoffs where rdrobust() encountered problems}
 }
 \description{
-\code{rdmcplot()} RD plots with multiple cutoffs.
+\code{rdmcplot()} implements data-driven Regression Discontinuity (RD) plots
+for designs with multiple cutoffs.
 }
 \examples{
 # Toy dataset
@@ -128,9 +146,9 @@ tmp <- rdmcplot(Y,X,C)
 Cattaneo, M.D., R. Titiunik and G. Vazquez-Bare. (2020). \href{https://rdpackages.github.io/references/Cattaneo-Titiunik-VazquezBare_2020_Stata.pdf}{Analysis of Regression Discontinuity Designs with Multiple Cutoffs or Multiple Scores}. \emph{Stata Journal}, forthcoming.
 }
 \author{
-Matias Cattaneo, Princeton University. \email{cattaneo@princeton.edu}
+Matias D. Cattaneo, Princeton University. \email{matias.d.cattaneo@gmail.com}
 
-Rocio Titiunik, Princeton University. \email{titiunik@princeton.edu}
+Rocio Titiunik, Princeton University. \email{rocio.titiunik@gmail.com}
 
-Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquez@econ.ucsb.edu}
+Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquezbare@gmail.com}
 }

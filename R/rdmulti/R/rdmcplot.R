@@ -1,20 +1,21 @@
 ###################################################################
-# rdmcplot: RD plots with multiple cutoffs
-# !version 1.2 22-May-2025
+# rdmcplot: data-driven RD plots for multi-cutoff designs
+# !version 2.0.0 15-May-2026
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
-#' RD plots with multiple cutoffs.
+#' Data-driven RD plots for multi-cutoff designs
 #'
-#' \code{rdmcplot()} RD plots with multiple cutoffs.
+#' \code{rdmcplot()} implements data-driven Regression Discontinuity (RD) plots
+#' for designs with multiple cutoffs.
 #'
 #'
 #' @author
-#' Matias Cattaneo, Princeton University. \email{cattaneo@princeton.edu}
+#' Matias D. Cattaneo, Princeton University. \email{matias.d.cattaneo@gmail.com}
 #'
-#' Rocio Titiunik, Princeton University. \email{titiunik@princeton.edu}
+#' Rocio Titiunik, Princeton University. \email{rocio.titiunik@gmail.com}
 #'
-#' Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquez@econ.ucsb.edu}
+#' Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquezbare@gmail.com}
 #'
 #' @references
 #'
@@ -47,8 +48,13 @@
 #'   covariates. See \code{rdrobust()} for details.
 #' @param covs_dropvec vector indicating whether collinear covariates should be
 #'   dropped at each cutoff. See \code{rdrobust()} for details.
+#' @param ginv.tolvec vector of cutoff-specific tolerances for generalized
+#'   inverse calculations. See \code{rdplot()} for details.
+#' @param masspointsvec vector indicating how to handle repeated values at each
+#'   cutoff. See \code{rdplot()} for details.
 #' @param ci adds confidence intervals of the specified level to the plot. See
 #'   \code{rdrobust()} for details.
+#' @param shade passes the shaded confidence interval option to \code{rdplot()}.
 #' @param col_bins vector of colors for bins.
 #' @param pch_bins vector of characters (pch) type for bins.
 #' @param col_poly vector of colors for polynomial curves.
@@ -59,6 +65,8 @@
 #' @param nopoly omits polynomial curve plot.
 #' @param noxline omits vertical lines indicating the cutoffs.
 #' @param nodraw omits plot.
+#' @param subset optional subset of observations to use.
+#' @param data optional data frame for resolving string variable names.
 #'
 #'
 #' @return
@@ -90,13 +98,30 @@
 rdmcplot <- function(Y,X,C,nbinsmat=NULL,binselectvec=NULL,scalevec=NULL,
                      supportmat=NULL,pvec=NULL,hmat=NULL,kernelvec=NULL,
                      weightsvec=NULL,covs_mat=NULL,covs_list=NULL,covs_evalvec=NULL,
-                     covs_dropvec=NULL,ci=NULL,col_bins=NULL,pch_bins=NULL,
+                     covs_dropvec=NULL,ginv.tolvec=NULL,masspointsvec=NULL,
+                     ci=NULL,shade=FALSE,col_bins=NULL,pch_bins=NULL,
                      col_poly=NULL,lty_poly=NULL,col_xline=NULL,lty_xline=NULL,
-                     nobins=FALSE,nopoly=FALSE,noxline=FALSE,nodraw=FALSE){
+                     nobins=FALSE,nopoly=FALSE,noxline=FALSE,nodraw=FALSE,
+                     subset=NULL,data=NULL){
 
   #################################################################
   # Setup and error checking
   #################################################################
+
+  if (!is.null(data)){
+    if (is.character(Y) && length(Y)==1) Y <- data[[Y]]
+    if (is.character(X) && length(X)==1) X <- data[[X]]
+    if (is.character(C) && length(C)==1) C <- data[[C]]
+    if (!is.null(covs_mat) && is.character(covs_mat)) covs_mat <- data[,covs_mat,drop=FALSE]
+  }
+
+  n.orig <- length(Y)
+  if (!is.null(subset)){
+    Y <- Y[subset]
+    X <- X[subset]
+    C <- C[subset]
+    if (!is.null(covs_mat) && nrow(as.matrix(covs_mat))==n.orig) covs_mat <- as.matrix(covs_mat)[subset,,drop=FALSE]
+  }
 
   if (!is.numeric(C)){stop('C has to be numeric')}
   if (max(C,na.rm=TRUE)>=max(X,na.rm=TRUE) | min(C,na.rm=TRUE)<=min(X,na.rm=TRUE)){stop('cutoff variable outside range of running variable')}
@@ -120,11 +145,20 @@ rdmcplot <- function(Y,X,C,nbinsmat=NULL,binselectvec=NULL,scalevec=NULL,
       nbinsmat <- matrix(nbinsmat,nrow=cnum,ncol=2)
     }
   }
+  if (!is.null(supportmat)){
+    if (is.null(dim(supportmat))){
+      supportmat <- matrix(supportmat,nrow=cnum,ncol=2)
+    }
+  } else{
+    supportmat <- matrix(NA,nrow=cnum,ncol=2)
+  }
   if (is.null(binselectvec)) binselectvec <- rep('esmv',cnum)
   if (is.null(scalevec)) scalevec <- rep(1,cnum)
   if (is.null(kernelvec)) kernelvec <- rep('uni',cnum)
-  if (is.null(covs_evalvec)) covs_evalvec <- rep(0,cnum)
+  if (is.null(covs_evalvec)) covs_evalvec <- rep('mean',cnum)
   if (is.null(covs_dropvec)) covs_dropvec <- rep(TRUE,cnum)
+  if (is.null(ginv.tolvec)) ginv.tolvec <- rep(1e-20,cnum)
+  if (is.null(masspointsvec)) masspointsvec <- rep('adjust',cnum)
   if (!is.null(covs_mat)){
     covs_mat <- as.matrix(covs_mat)
     if (!is.null(covs_list)){
@@ -151,16 +185,17 @@ rdmcplot <- function(Y,X,C,nbinsmat=NULL,binselectvec=NULL,scalevec=NULL,
   count_fail <- 0
   for (c in clist){
 
-    yc <- Y[C==c & X<=c+haux[count,2] & X>=c-haux[count,1]]
-    xc <- X[C==c & X<=c+haux[count,2] & X>=c-haux[count,1]]
-    dc <- D[C==c & X<=c+haux[count,2] & X>=c-haux[count,1]]
+    use <- C==c & X<=c+haux[count,2] & X>=c-haux[count,1]
+    yc <- Y[use]
+    xc <- X[use]
+    dc <- D[use]
     yc0 <- yc[dc==0]
     yc1 <- yc[dc==1]
     xc0 <- xc[dc==0]
     xc1 <- xc[dc==1]
 
     if (!is.null(covs_mat)){
-      covs_mat_c <- covs_mat[C==c & X<=c+haux[count,2] & X>=c-haux[count,1],]
+      covs_mat_c <- covs_mat[use,,drop=FALSE]
       if (!is.null(covs_list)){
         covs_aux <- covs_mat_c[,covs_list[[count]]]
       } else{
@@ -174,7 +209,6 @@ rdmcplot <- function(Y,X,C,nbinsmat=NULL,binselectvec=NULL,scalevec=NULL,
                                 nbins=nbinsmat[count,],
                                 binselect=binselectvec[count],
                                 scale=scalevec[count],
-                                support=supportmat[count,],
                                 p=pvec[count],
                                 h=hmat[count,],
                                 kernel=kernelvec[count],
@@ -182,7 +216,11 @@ rdmcplot <- function(Y,X,C,nbinsmat=NULL,binselectvec=NULL,scalevec=NULL,
                                 covs=covs_aux,
                                 covs_eval=covs_evalvec[count],
                                 covs_drop=covs_dropvec[count],
+                                ginv.tol=ginv.tolvec[count],
+                                support=if (all(is.na(supportmat[count,]))) NULL else supportmat[count,],
+                                masspoints=masspointsvec[count],
                                 ci=ci,
+                                shade=shade,
                                 hide=TRUE),
                silent=TRUE)
 
@@ -287,18 +325,22 @@ rdmcplot <- function(Y,X,C,nbinsmat=NULL,binselectvec=NULL,scalevec=NULL,
 
   if (nobins==FALSE){
     for (c in 1:cnum){
-      rdmc_plot <- rdmc_plot + geom_point(aes_string(x=Xmean[,c],y=Ymean[,c]),col=col_bins[c],shape=pch_bins[c],na.rm=TRUE)
+      plot_data <- data.frame(x=Xmean[,c], y=Ymean[,c])
+      rdmc_plot <- rdmc_plot + geom_point(data=plot_data, aes(x=.data$x,y=.data$y), col=col_bins[c], shape=pch_bins[c], na.rm=TRUE)
     }
   }
   if (!is.null(ci)){
     for (c in 1:cnum){
-      rdmc_plot <- rdmc_plot + geom_errorbar(aes_string(x=Xmean[,c],ymin=CI_l[,c],ymax=CI_r[,c]),col=col_bins[c],linetype=1)
+      ci_data <- data.frame(x=Xmean[,c], ymin=CI_l[,c], ymax=CI_r[,c])
+      rdmc_plot <- rdmc_plot + geom_errorbar(data=ci_data, aes(x=.data$x,ymin=.data$ymin,ymax=.data$ymax), col=col_bins[c], linetype=1)
     }
   }
   if (nopoly==FALSE){
     for (c in 1:cnum){
-      rdmc_plot <- rdmc_plot + geom_line(aes_string(x=X0[,c],y=Yhat0[,c]),col=col_poly[c],linetype=lty_poly[c],na.rm=TRUE) +
-        geom_line(aes_string(x=X1[,c],y=Yhat1[,c]),col=col_poly[c],linetype=lty_poly[c],na.rm=TRUE)
+      poly_l <- data.frame(x=X0[,c], y=Yhat0[,c])
+      poly_r <- data.frame(x=X1[,c], y=Yhat1[,c])
+      rdmc_plot <- rdmc_plot + geom_line(data=poly_l, aes(x=.data$x,y=.data$y), col=col_poly[c], linetype=lty_poly[c], na.rm=TRUE) +
+        geom_line(data=poly_r, aes(x=.data$x,y=.data$y), col=col_poly[c], linetype=lty_poly[c], na.rm=TRUE)
     }
   }
   if (noxline==FALSE){

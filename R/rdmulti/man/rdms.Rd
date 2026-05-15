@@ -2,7 +2,7 @@
 % Please edit documentation in R/rdms.R
 \name{rdms}
 \alias{rdms}
-\title{Analysis of RD designs with cumulative cutoffs or two running variables}
+\title{Point estimation and robust bias-corrected inference for multi-score designs}
 \usage{
 rdms(
   Y,
@@ -36,9 +36,13 @@ rdms(
   vcevec = NULL,
   nnmatchvec = NULL,
   cluster = NULL,
+  ginv.tolvec = NULL,
+  sharpbwvec = NULL,
   level = 95,
   plot = FALSE,
-  conventional = FALSE
+  conventional = FALSE,
+  subset = NULL,
+  data = NULL
 )
 }
 \arguments{
@@ -124,6 +128,12 @@ estimation. See \code{rdrobust()} for details.}
 
 \item{cluster}{cluster ID variable. See \code{rdrobust()} for details.}
 
+\item{ginv.tolvec}{vector of cutoff-specific tolerances for generalized
+inverse calculations. See \code{rdrobust()} for details.}
+
+\item{sharpbwvec}{vector indicating whether fuzzy RD bandwidth selection
+uses the sharp RD model at each cutoff. See \code{rdrobust()} for details.}
+
 \item{level}{confidence level for confidence intervals. See \code{rdrobust()}
 for details.}
 
@@ -131,6 +141,10 @@ for details.}
 
 \item{conventional}{reports conventional, instead of robust-bias corrected,
 p-values and confidence intervals.}
+
+\item{subset}{optional subset of observations to use.}
+
+\item{data}{optional data frame for resolving string variable names.}
 }
 \value{
 \item{B}{vector of bias-corrected coefficients}
@@ -140,7 +154,9 @@ at each cutoff} \item{CI}{bias corrected confidence intervals}
 \item{H}{bandwidth used at each cutoff} \item{Pv}{vector of robust p-values}
 }
 \description{
-\code{rdms()} analyzes RD designs with cumulative cutoffs or two running variables.
+\code{rdms()} implements point estimation and robust bias-corrected inference
+for Regression Discontinuity (RD) designs with multiple scores, including
+cumulative-cutoff designs and designs with two running variables.
 }
 \examples{
 # Toy dataset: cumulative cutoffs
@@ -156,9 +172,9 @@ tmp <- rdms(Y,X,C)
 Cattaneo, M.D., R. Titiunik and G. Vazquez-Bare. (2020). \href{https://rdpackages.github.io/references/Cattaneo-Titiunik-VazquezBare_2020_Stata.pdf}{Analysis of Regression Discontinuity Designs with Multiple Cutoffs or Multiple Scores}. \emph{Stata Journal}, forthcoming.
 }
 \author{
-Matias Cattaneo, Princeton University. \email{cattaneo@princeton.edu}
+Matias D. Cattaneo, Princeton University. \email{matias.d.cattaneo@gmail.com}
 
-Rocio Titiunik, Princeton University. \email{titiunik@princeton.edu}
+Rocio Titiunik, Princeton University. \email{rocio.titiunik@gmail.com}
 
-Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquez@econ.ucsb.edu}
+Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquezbare@gmail.com}
 }

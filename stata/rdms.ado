@@ -1,6 +1,6 @@
 ********************************************************************************
 * RDMS: analysis of Regression Discontinuity Designs with multiple scores
-* !version 1.0 2025-05-22
+* !version 2.0.0 2026-05-15
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
@@ -10,11 +10,11 @@ program define rdms, eclass sortpreserve
 	syntax varlist (min=2 max=4) [if] [in], Cvar(string) [range(string) xnorm(string) pooled_opt(string) ///
 														  DERIVvar(string) Pvar(string) Qvar(string) ///
 														  Hvar(string) HRightvar(string) Bvar(string) BRightvar(string) ///
-														  RHOvar(string) COVSvar(string) COVSDROPvar(string) KERNELvar(string) ///
+														  RHOvar(string) COVSvar(string) COVS_DROPvar(string) KERNELvar(string) ///
 														  WEIGHTSvar(string) BWSELECTvar(string) VCEvar(string) level(real 95) ///
 														  SCALEPARvar(string) SCALEREGULvar(string) fuzzy(string) ///
 														  MASSPOINTSvar(string) BWCHECKvar(string) BWRESTRICTvar(string) STDVARSvar(string) ///
-														  plot graph_opt(string) CONVentional]
+														  plot graph_opt(string) CONVentional all detail vleverage NOCHECKS NOWARNINGS]
 
 	
 ********************************************************************************
@@ -199,16 +199,16 @@ program define rdms, eclass sortpreserve
 		}
 	}
 	
-	if "`covsdropvar'"!=""{
-		capture confirm string variable `covsdropvar'
+	if "`covs_dropvar'"!=""{
+		capture confirm string variable `covs_dropvar'
 		if _rc!=0 {
-			di as error "covsdrop variable has to be string"
+			di as error "covs_drop variable has to be string"
 			exit 108
 		}
-		qui count if `covsdropvar'!=""
-		local n_covsdropvar = r(N)
-		if `n_covsdropvar' != `n_cutoffs' {
-			di as error "lengths of covsdropvar and cvar have to coincide"
+		qui count if `covs_dropvar'!=""
+		local n_covs_dropvar = r(N)
+		if `n_covs_dropvar' != `n_cutoffs' {
+			di as error "lengths of covs_dropvar and cvar have to coincide"
 			exit 125
 		}
 	}
@@ -346,7 +346,7 @@ program define rdms, eclass sortpreserve
 			exit 108
 		}
 		qui count if `stdvarsvar'!=""
-		local n_bwrestrictvar = r(N)
+		local n_stdvarsvar = r(N)
 		if `n_stdvarsvar' != `n_cutoffs' {
 			di as error "lengths of stdvarsvar and cvar have to coincide"
 			exit 125
@@ -356,6 +356,11 @@ program define rdms, eclass sortpreserve
 	if "`fuzzy'"!=""{
 		local fuzzy_opt "fuzzy(`fuzzy')"
 	}
+	if "`all'"!="" local all_opt "all"
+	if "`detail'"!="" local detail_opt "detail"
+	if "`vleverage'"!="" local vleverage_opt "vleverage"
+	if "`nochecks'"!="" local nochecks_opt "nochecks"
+	if "`nowarnings'"!="" local nowarnings_opt "nowarnings"
 	
 	tempname b V
 	
@@ -456,9 +461,9 @@ program define rdms, eclass sortpreserve
 				local covs_opt "covs(`covs')"
 			}
 			
-			if "`covsdropvar'"!=""{
-				local covsdrop = `covsdropvar'[`count']
-				local covsdrop_opt "covs_drop(`covsdrop')"
+			if "`covs_dropvar'"!=""{
+				local covs_drop = `covs_dropvar'[`c']
+				local covs_drop_opt "covs_drop(`covs_drop')"
 			}
 			
 			if "`kernelvar'"!=""{
@@ -492,28 +497,29 @@ program define rdms, eclass sortpreserve
 			}
 			
 			if "`masspointsvar'"!=""{
-				local masspoints = `masspointsvar'[`count']
+				local masspoints = `masspointsvar'[`c']
 				local masspoints_opt "masspoints(`masspoints')"
 			}
 		
 			if "`bwcheckvar'"!=""{
-				local bwcheck = `bwcheckvar'[`count']
+				local bwcheck = `bwcheckvar'[`c']
 				local bwcheck_opt "bwcheck(`bwcheck')"
 			}
 		
 			if "`bwrestrictvar'"!=""{
-				local bwrestrict = `bwrestrict'[`count']
+				local bwrestrict = `bwrestrictvar'[`c']
 				local bwrestrict_opt "bwrestrict(`bwrestrict')"
 			}
 		
 			if "`stdvarsvar'"!=""{
-				local stdvars = `stdvars'[`count']
+				local stdvars = `stdvarsvar'[`c']
 				local stdvars_opt "stdvars(`stdvars')"
 			}		
 			
-			qui rdrobust `yvar' `xc_`c'' if `range_c'[`c']<=`xc_`c'' & `xc_`c''<=`range_t'[`c'] & `touse', `deriv_opt' `p_opt' `q_opt' `h_opt' `b_opt' `rho_opt' `covs_opt' `covsdrop_opt' ///
+			qui rdrobust `yvar' `xc_`c'' if `range_c'[`c']<=`xc_`c'' & `xc_`c''<=`range_t'[`c'] & `touse', `deriv_opt' `p_opt' `q_opt' `h_opt' `b_opt' `rho_opt' `covs_opt' `covs_drop_opt' ///
 																										   `k_opt' `weights_opt' `bwselect_opt' `vce_opt' `scalepar_opt' `scaleregul_opt' ///
-																										   `fuzzy_opt'  level(`level') `masspoints_opt' `bwcheck_opt' `bwrestrict_opt' `stdvars_opt'
+																										   `fuzzy_opt'  level(`level') `masspoints_opt' `bwcheck_opt' `bwrestrict_opt' `stdvars_opt' ///
+																										   `all_opt' `detail_opt' `vleverage_opt' `nochecks_opt' `nowarnings_opt'
 			
 			local h_`c' = e(h_l)
 			local n_h_`c' = e(N_h_l) + e(N_h_r)
@@ -606,6 +612,11 @@ program define rdms, eclass sortpreserve
 				local covs = `covsvar'[`c']
 				local covs_opt "covs(`covs')"
 			}
+
+			if "`covs_dropvar'"!=""{
+				local covs_drop = `covs_dropvar'[`c']
+				local covs_drop_opt "covs_drop(`covs_drop')"
+			}
 			
 			if "`kernelvar'"!=""{
 				local kernel = `kernelvar'[`c']
@@ -638,28 +649,29 @@ program define rdms, eclass sortpreserve
 			}
 			
 			if "`masspointsvar'"!=""{
-				local masspoints = `masspointsvar'[`count']
+				local masspoints = `masspointsvar'[`c']
 				local masspoints_opt "masspoints(`masspoints')"
 			}
 		
 			if "`bwcheckvar'"!=""{
-				local bwcheck = `bwcheckvar'[`count']
+				local bwcheck = `bwcheckvar'[`c']
 				local bwcheck_opt "bwcheck(`bwcheck')"
 			}
 		
 			if "`bwrestrictvar'"!=""{
-				local bwrestrict = `bwrestrict'[`count']
+				local bwrestrict = `bwrestrictvar'[`c']
 				local bwrestrict_opt "bwrestrict(`bwrestrict')"
 			}
 		
 			if "`stdvarsvar'"!=""{
-				local stdvars = `stdvars'[`count']
+				local stdvars = `stdvarsvar'[`c']
 				local stdvars_opt "stdvars(`stdvars')"
 			}		
 
-			qui rdrobust `yvar' `xc_`c'' if -`range_c'[`c']<=`xc_`c'' & `xc_`c''<=`range_t'[`c'] & `touse', `deriv_opt' `p_opt' `q_opt' `h_opt' `b_opt' `rho_opt' `covs_opt' `covsdrop_opt' ///
+			qui rdrobust `yvar' `xc_`c'' if -`range_c'[`c']<=`xc_`c'' & `xc_`c''<=`range_t'[`c'] & `touse', `deriv_opt' `p_opt' `q_opt' `h_opt' `b_opt' `rho_opt' `covs_opt' `covs_drop_opt' ///
 																										   `k_opt' `weights_opt' `bwselect_opt' `vce_opt' `scalepar_opt' `scaleregul_opt' ///
-																										   `fuzzy_opt'  level(`level') `masspoints_opt' `bwcheck_opt' `bwrestrict_opt' `stdvars_opt'
+																										   `fuzzy_opt'  level(`level') `masspoints_opt' `bwcheck_opt' `bwrestrict_opt' `stdvars_opt' ///
+																										   `all_opt' `detail_opt' `vleverage_opt' `nochecks_opt' `nowarnings_opt'
 			
 			local h_`c' = e(h_l)
 			local n_h_`c' = e(N_h_l) + e(N_h_r)
@@ -702,7 +714,7 @@ program define rdms, eclass sortpreserve
 	
 	if "`xnorm'"!=""{
 		
-		qui rdrobust `yvar' `xnorm' if `touse', `pooled_opt'
+		qui rdrobust `yvar' `xnorm' if `touse', `pooled_opt' `fuzzy_opt' level(`level') `all_opt' `detail_opt' `vleverage_opt' `nochecks_opt' `nowarnings_opt'
 		
 		local tau_pooled = e(tau_cl)
 		local h_l_pooled = e(h_l)

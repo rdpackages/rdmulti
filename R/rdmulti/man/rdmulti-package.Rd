@@ -5,15 +5,17 @@
 \alias{rdmulti}
 \alias{rdmulti-package}
 \alias{rdmulti_package}
-\title{rdmulti: analysis of RD Designs with multiple cutoffs or scores}
+\title{Robust Local Polynomial Methods for RD designs with Multiple Cutoffs or Multiple Scores}
 \description{
-The regression discontinuity (RD) design is a popular quasi-experimental design
-for causal inference and policy evaluation. The \code{'rdmulti'} package provides tools
-to analyze RD designs with multiple cutoffs or scores: \code{\link{rdmc}()} estimates
-pooled and cutoff-specific effects in multi-cutoff designs, \code{\link{rdmcplot}()}
-draws RD plots for multi-cutoff RD designs and \code{\link{rdms}()} estimates effects in
-cumulative cutoffs or multi-score designs. For more details, and related \code{Stata} and
-\code{R} packages useful for analysis of RD designs, visit \url{https://rdpackages.github.io/}.
+The package \code{rdmulti} implements estimation, inference, and graphical
+procedures for Regression Discontinuity (RD) designs with multiple cutoffs or
+multiple scores. \code{\link{rdmc}()} provides point estimation and robust
+bias-corrected inference for multi-cutoff designs, \code{\link{rdmcplot}()}
+provides data-driven RD plots for multi-cutoff designs, and
+\code{\link{rdms}()} provides point estimation and robust bias-corrected
+inference for multi-score designs. For more details, and related \code{Stata}
+and \code{R} packages useful for analysis of RD designs, visit
+\url{https://rdpackages.github.io/}.
 }
 \references{
 Calonico, S., M.D. Cattaneo, M. Farrell and R. Titiunik. (2017). \href{https://rdpackages.github.io/references/Calonico-Cattaneo-Farrell-Titiunik_2017_Stata.pdf}{ \code{rdrobust}: Software for Regression Discontinuity Designs}. \emph{Stata Journal} 17(2): 372-404.
@@ -30,10 +32,18 @@ Cattaneo, M.D., R. Titiunik and G. Vazquez-Bare. (2020). \href{https://rdpackage
 
 Keele, L. and R. Titiunik. (2015). \href{https://rdpackages.github.io/references/Keele-Titiunik_2015_PA.pdf}{Geographic Boundaries as Regression Discontinuities}. \emph{Political Analysis} 23(1): 127-155
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/rdpackages/rdmulti}
+  \item Report bugs at \url{https://github.com/rdpackages/rdmulti/issues}
+}
+
+}
 \author{
-Matias Cattaneo, Princeton University. \email{cattaneo@princeton.edu}
+Matias D. Cattaneo, Princeton University. \email{matias.d.cattaneo@gmail.com}
 
-Rocio Titiunik, Princeton University. \email{titiunik@princeton.edu}
+Rocio Titiunik, Princeton University. \email{rocio.titiunik@gmail.com}
 
-Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquez@econ.ucsb.edu}
+Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquezbare@gmail.com}
 }

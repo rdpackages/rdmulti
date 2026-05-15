@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0 2025-05-22}{...}
+{* *! version 2.0.0 2026-05-15}{...}
 {viewerjumpto "Syntax" "rdms##syntax"}{...}
 {viewerjumpto "Description" "rdms##description"}{...}
 {viewerjumpto "Options" "rdms##options"}{...}
@@ -10,7 +10,7 @@
 
 {title:Title}
 
-{p 4 8}{cmd:rdms} {hline 2} Analysis of Regression Discontinuity Designs with Multiple Scores.{p_end}
+{p 4 8}{cmd:rdms} {hline 2} Point Estimation and Robust Bias-Corrected Inference for Multi-Score Designs.{p_end}
 
 {marker syntax}{...}
 {title:Syntax}
@@ -31,7 +31,7 @@
 {cmd:{opt br:ightvar}(}{it:string}{cmd:)} 
 {cmd:{opt rho:var}(}{it:string}{cmd:)} 
 {cmd:{opt covs:var}(}{it:string}{cmd:)} 
-{cmd:{opt covsdrop:var}(}{it:string}{cmd:)} 
+{cmd:{opt covs_drop:var}(}{it:string}{cmd:)}
 {cmd:{opt kernel:var}(}{it:string}{cmd:)} 
 {cmd:{opt weights:var}(}{it:string}{cmd:)} 
 {cmd:{opt bwselect:var}(}{it:string}{cmd:)} 
@@ -43,8 +43,14 @@
 {cmd:{opt stdvars:var}(}{it:string}{cmd:)} 
 {cmd:{opt vce:var}(}{it:string}{cmd:)} 
 {cmd:level({it:#})}
+{cmd:all}
+{cmd:detail}
+{cmd:vleverage}
+{cmd:nochecks}
+{cmd:nowarnings}
 {cmd:plot} 
 {cmd:graph_opt(}{it:string}{cmd:)} 
+{cmd:conventional}
 ]{p_end}
 
 {synoptset 28 tabbed}{...}
@@ -52,7 +58,7 @@
 {marker description}{...}
 {title:Description}
 
-{p 4 8}{cmd:rdms} provides tools to analyze regression discontinuity (RD) designs with multiple scores.
+{p 4 8}{cmd:rdms} implements point estimation and robust bias-corrected inference for regression discontinuity (RD) designs with multiple scores.
 For methodological background see
 {browse "https://rdpackages.github.io/references/Keele-Titiunik_2015_PA.pdf":Keele and Titiunik (2015)},
 {browse "https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2016_JOP.pdf":Cattaneo, Keele, Titiunik and Vazquez-Bare (2016)}, and
@@ -63,7 +69,7 @@ It also computes alternative estimation and inference procedures available in th
 cumulative cutoffs in which a unit gets different dosages of a treatment depending on the value of {it:runvar1}. If {it:runvar1}, {it:runvar2} and {it:treatvar}
 are specified, {cmd:rdms} analyzes an RD design with two running variables in which units with {it:treatvar} equal to one are treated.{p_end}
 
-{p 8 8}Companion commands are: {help rdmc:rdmc} for multi-cutoff RD estimation and inference, and {help rdmcplot:rdmcplot} for multi-cutoff RD plots.{p_end}
+{p 8 8}Companion commands are: {help rdmc:rdmc} for point estimation and robust bias-corrected inference for multi-cutoff designs, and {help rdmcplot:rdmcplot} for data-driven RD plots for multi-cutoff designs.{p_end}
 
 {p 8 8}A detailed introduction to this command is given in
 {browse "https://rdpackages.github.io/references/Cattaneo-Titiunik-VazquezBare_2020_rdmulti.pdf": Cattaneo, Titiunik and Vazquez-Bare (2020)}.{p_end}
@@ -94,7 +100,7 @@ or the two scores {it:cvar1} and {it:cvar2} in a two-score setting.{p_end}
 
 {p 4 8}{cmd:xnorm(}{it:string}{cmd:)} specifies the normalized running variable to estimate pooled effect.{p_end}
 
-{p 4 8}{cmd:fuzzy(}{it:string}{cmd:)} indicates a fuzzy design.
+{p 4 8}{cmd:fuzzy(}{it:string}{cmd:)} indicates a fuzzy design. Use {cmd:fuzzy(}{it:treatvar sharpbw}{cmd:)} to request sharp-RD bandwidth selection for fuzzy RD.
 See {help rdrobust:rdrobust} for details.{p_end}
 
 {p 4 8}{cmd:{opt deriv:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies the order of the derivative for {cmd:rdrobust} to calculate cutoff-specific estimates.
@@ -135,7 +141,7 @@ See {help rdrobust:rdrobust} for details.{p_end}
 {p 4 8}{cmd:{opt covs:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies the covariates for {cmd:rdrobust} to calculate cutoff-specific estimates.
 See {help rdrobust:rdrobust} for details.{p_end}
 
-{p 4 8}{cmd:{opt covsdrop:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies whether collinear covariates should be dropped.
+{p 4 8}{cmd:{opt covs_drop:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies whether collinear covariates should be dropped.
 See {help rdrobust:rdrobust} for details.{p_end}
 
 {p 4 8}{cmd:{opt kernel:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies the kernels for {cmd:rdrobust} to calculate cutoff-specific estimates.
@@ -169,13 +175,17 @@ See {help rdrobust:rdrobust} for details.{p_end}
 
 {dlgtab:Variance-Covariance Estimation and Inference}
 
-{p 4 8}{cmd:{opt vce:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies the variance-covariance matrix estimation method for {cmd:rdrobust} to calculate cutoff-specific estimates.
+{p 4 8}{cmd:{opt vce:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies the variance-covariance matrix estimation method for {cmd:rdrobust} to calculate cutoff-specific estimates. Current options include {cmd:nn}, {cmd:hc0}, {cmd:hc1}, {cmd:hc2}, {cmd:hc3}, {cmd:cr1}, {cmd:cr2}, and {cmd:cr3}; cluster-robust options include the cluster variable in the same string, for example {cmd:cr2 schoolid}.
 See {help rdrobust:rdrobust} for details.{p_end}
 
 {p 4 8}{cmd:level(}{it:#}{cmd:)} specifies the confidence level for confidence intervals.
 See {help rdrobust:rdrobust} for details.{p_end}
 
-{p 4 8}{cmd:verbose} displays conventional, instead of robust-bias corrected, p-values and confidence intervals.{p_end}
+{p 4 8}{cmd:all}, {cmd:detail}, and {cmd:vleverage} pass the corresponding display and diagnostic options to {cmd:rdrobust}.{p_end}
+
+{p 4 8}{cmd:nochecks} and {cmd:nowarnings} pass the corresponding validation and warning controls to {cmd:rdrobust}.{p_end}
+
+{p 4 8}{cmd:conventional} displays conventional, instead of robust-bias corrected, p-values and confidence intervals.{p_end}
 
 {dlgtab:Plot}
 
@@ -253,13 +263,13 @@ See {help rdrobust:rdrobust} for details.{p_end}
 {title:Authors}
 
 {p 4 8}Matias D. Cattaneo, Princeton University, Princeton, NJ.
-{browse "mailto:cattaneo@princeton.edu":cattaneo@princeton.edu}.{p_end}
+{browse "mailto:matias.d.cattaneo@gmail.com":matias.d.cattaneo@gmail.com}.{p_end}
 
 {p 4 8}Rocio Titiunik, Princeton University, Princeton, NJ.
-{browse "mailto:titiunik@princeton.edu":titiunik@princeton.edu}.{p_end}
+{browse "mailto:rocio.titiunik@gmail.com":rocio.titiunik@gmail.com}.{p_end}
 
 {p 4 8}Gonzalo Vazquez-Bare, UC Santa Barbara, Santa Barbara, CA.
-{browse "mailto:gvazquez@econ.ucsb.edu":gvazquez@econ.ucsb.edu}.{p_end}
+{browse "mailto:gvazquezbare@gmail.com":gvazquezbare@gmail.com}.{p_end}
 
 
 

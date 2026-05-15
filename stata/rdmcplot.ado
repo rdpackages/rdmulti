@@ -1,19 +1,20 @@
 ********************************************************************************
 * RDMCPLOT: Regression discontinuity plots with multiple cutoffs
-* !version 1.0 2025-05-22
+* !version 2.0.0 2026-05-15
 * Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
 capture program drop rdmcplot
 program define rdmcplot, rclass 
 	syntax varlist (min=2 max=2) [if] [in], Cvar(string) [Pvar(string) NBINSvar(string) NBINSRightvar(string) ///
-														  COVSvar(string) COVSEVALvar(string) COVSDROPvar(string) BINSELECTvar(string) ///
+														  COVSvar(string) COVS_EVALvar(string) COVS_DROPvar(string) BINSELECTvar(string) ///
 														  SCALEvar(string) SCALERightvar(string) ///
 														  KERNELvar(string) WEIGHTSvar(string) ///
 														  Hvar(string) HRightvar(string) ///
+														  MASSPOINTSvar(string) ///
 														  SUPPORTvar(string) SUPPORTRightvar(string) /// 
 														  BINSOPTvar(string) LINEOPTvar(string) XLINEOPTvar(string) /// 
-														  ci(real 0) NObins NOpoly NOscatter NOxline NOdraw genvars]
+														  ci(real 0) shade NObins NOpoly NOscatter NOxline NOdraw genvars]
 	
 	
 ********************************************************************************
@@ -109,30 +110,30 @@ program define rdmcplot, rclass
 		}
 	}
 	
-	if "`covsevalvar'"!=""{
-		capture confirm string variable `covsevalvar'
+	if "`covs_evalvar'"!=""{
+		capture confirm string variable `covs_evalvar'
 		if _rc!=0 {
-			di as error "covseval variable has to be string"
+			di as error "covs_eval variable has to be string"
 			exit 108
 		}
-		qui count if `covsevalvar'!=""
-		local n_covsevalvar = r(N)
-		if `n_covsevalvar' != `n_cutoffs' {
-			di as error "length of covseval should equal number of cutoffs"
+		qui count if `covs_evalvar'!=""
+		local n_covs_evalvar = r(N)
+		if `n_covs_evalvar' != `n_cutoffs' {
+			di as error "length of covs_eval should equal number of cutoffs"
 			exit 125
 		}
 	}
 	
-	if "`covsdropvar'"!=""{
-		capture confirm string variable `covsdropvar'
+	if "`covs_dropvar'"!=""{
+		capture confirm string variable `covs_dropvar'
 		if _rc!=0 {
-			di as error "covsdrop variable has to be string"
+			di as error "covs_drop variable has to be string"
 			exit 108
 		}
-		qui count if `covsdropvar'!=""
-		local n_covsdropvar = r(N)
-		if `n_covsdropvar' != `n_cutoffs' {
-			di as error "length of covsdropvar should equal number of cutoffs"
+		qui count if `covs_dropvar'!=""
+		local n_covs_dropvar = r(N)
+		if `n_covs_dropvar' != `n_cutoffs' {
+			di as error "length of covs_dropvar should equal number of cutoffs"
 			exit 125
 		}
 	}
@@ -152,7 +153,7 @@ program define rdmcplot, rclass
 	}
 	
 	if "`scalevar'"!=""{
-		capture confirm numeric variable `scaleleftvar'
+		capture confirm numeric variable `scalevar'
 		if _rc!=0 {
 			di as error "scale variable has to be numeric"
 			exit 108
@@ -271,6 +272,20 @@ program define rdmcplot, rclass
 			}
 		}
 	}
+
+	if "`masspointsvar'"!=""{
+		capture confirm string variable `masspointsvar'
+		if _rc!=0 {
+			di as error "masspoints variable has to be string"
+			exit 108
+		}
+		qui count if `masspointsvar'!=""
+		local n_masspointsvar = r(N)
+		if `n_masspointsvar' != `n_cutoffs' {
+			di as error "length of masspoints should equal number of cutoffs"
+			exit 125
+		}
+	}
 	
 	if "`binsoptvar'"!=""{
 		capture confirm string variable `binsoptvar'
@@ -354,14 +369,14 @@ program define rdmcplot, rclass
 			local covs_opt "covs(`covs')"
 		}
 		
-		if "`covsevalvar'"!=""{
-			local covseval = `covsevalvar'[`i']
-			local covseval_opt "covseval(`covs_eval')"
+		if "`covs_evalvar'"!=""{
+			local covs_eval = `covs_evalvar'[`i']
+			local covs_eval_opt "covs_eval(`covs_eval')"
 		}
 		
-		if "`covsdropvar'"!=""{
-			local covsdrop = `covsdropvar'[`i']
-			local covsdrop_opt "covsdrop(`covs_drop')"
+		if "`covs_dropvar'"!=""{
+			local covs_drop = `covs_dropvar'[`i']
+			local covs_drop_opt "covs_drop(`covs_drop')"
 		}
 		
 		if "`binselectvar'"!=""{
@@ -377,7 +392,7 @@ program define rdmcplot, rclass
 		
 		if "`kernelvar'"!=""{
 			local kernel = `kernelvar'[`i']
-			local k_opt "kernel(`kernel')"
+			local kernel_opt "kernel(`kernel')"
 		}
 		
 		if "`weightsvar'"!=""{
@@ -393,9 +408,18 @@ program define rdmcplot, rclass
 		}
 		
 		if "`supportvar'"!=""{
-			local supleft = `supporvar'[`i']		
+			local supleft = `supportvar'[`i']
 			local supright = `supportrightvar'[`i']			
 			local support_opt "support(`supleft' `supright')"
+		}
+
+		if "`masspointsvar'"!=""{
+			local masspoints = `masspointsvar'[`i']
+			local masspoints_opt "masspoints(`masspoints')"
+		}
+
+		if "`shade'"!=""{
+			local shade_opt "shade"
 		}
 		
 		if "`binsoptvar'"!=""{
@@ -417,8 +441,8 @@ program define rdmcplot, rclass
 
 			qui {
 				capture drop rdplot_*
-				capture rdplot `yvar' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `touse' `range_cond', c(`c') `p_opt' `nbins_opt' `covs_opt' `covseval_opt' `covsdrop_opt' `binselect_opt' ///
-					                                                                                 `scale_opt' `kernel_opt' `weights_opt' `h_opt' `support_opt' genvars hide
+				capture rdplot `yvar' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `touse' `range_cond', c(`c') `p_opt' `nbins_opt' `covs_opt' `covs_eval_opt' `covs_drop_opt' `binselect_opt' ///
+					                                                                                 `scale_opt' `kernel_opt' `weights_opt' `h_opt' `support_opt' `masspoints_opt' genvars hide
 				if _rc!=0{
 					if `count_fail'==0{
 						mat c_failed = J(1,1,`c')
@@ -478,8 +502,8 @@ program define rdmcplot, rclass
 			
 			qui {
 				capture drop rdplot_*
-				capture rdplot `yvar' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `touse' `range_cond', c(`c') `p_opt' `nbins_opt' `covs_opt' `covseval_opt' `covsdrop_opt' `binselect_opt' ///
-					                                                                                 `scale_opt' `kernel_opt' `weights_opt' `h_opt' `support_opt' genvars hide ci(`ci')
+				capture rdplot `yvar' `xvar' if abs(`cvar'-`c')<=c(epsfloat) & `touse' `range_cond', c(`c') `p_opt' `nbins_opt' `covs_opt' `covs_eval_opt' `covs_drop_opt' `binselect_opt' ///
+					                                                                                 `scale_opt' `kernel_opt' `weights_opt' `h_opt' `support_opt' `masspoints_opt' genvars hide ci(`ci') `shade_opt'
 				if _rc!=0{
 					if `count_fail'==0{
 						mat c_failed = J(1,1,`c')

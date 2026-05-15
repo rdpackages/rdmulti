@@ -1,25 +1,27 @@
 ###################################################################
-# rdmulti: analysis of RD designs with multiple cutoffs or scores
-# !version 1.2 22-May-2025
+# rdmulti: Robust Local Polynomial Methods for RD designs with Multiple Cutoffs or Multiple Scores
+# !version 2.0.0 15-May-2026
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
-#' rdmulti: analysis of RD Designs with multiple cutoffs or scores
+#' Robust Local Polynomial Methods for RD designs with Multiple Cutoffs or Multiple Scores
 #'
-#' The regression discontinuity (RD) design is a popular quasi-experimental design
-#' for causal inference and policy evaluation. The \code{'rdmulti'} package provides tools
-#' to analyze RD designs with multiple cutoffs or scores: \code{\link{rdmc}()} estimates
-#' pooled and cutoff-specific effects in multi-cutoff designs, \code{\link{rdmcplot}()}
-#' draws RD plots for multi-cutoff RD designs and \code{\link{rdms}()} estimates effects in
-#' cumulative cutoffs or multi-score designs. For more details, and related \code{Stata} and
-#' \code{R} packages useful for analysis of RD designs, visit \url{https://rdpackages.github.io/}.
+#' The package \code{rdmulti} implements estimation, inference, and graphical
+#' procedures for Regression Discontinuity (RD) designs with multiple cutoffs or
+#' multiple scores. \code{\link{rdmc}()} provides point estimation and robust
+#' bias-corrected inference for multi-cutoff designs, \code{\link{rdmcplot}()}
+#' provides data-driven RD plots for multi-cutoff designs, and
+#' \code{\link{rdms}()} provides point estimation and robust bias-corrected
+#' inference for multi-score designs. For more details, and related \code{Stata}
+#' and \code{R} packages useful for analysis of RD designs, visit
+#' \url{https://rdpackages.github.io/}.
 #'
 #' @author
-#' Matias Cattaneo, Princeton University. \email{cattaneo@princeton.edu}
+#' Matias D. Cattaneo, Princeton University. \email{matias.d.cattaneo@gmail.com}
 #'
-#' Rocio Titiunik, Princeton University. \email{titiunik@princeton.edu}
+#' Rocio Titiunik, Princeton University. \email{rocio.titiunik@gmail.com}
 #'
-#' Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquez@econ.ucsb.edu}
+#' Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquezbare@gmail.com}
 #'
 #' @references
 #'
@@ -51,6 +53,8 @@
 #' @importFrom stats poly
 #' @importFrom stats pnorm
 #' @importFrom stats qnorm
+#' @importFrom stats na.omit
+#' @importFrom rlang .data
 #' @import ggplot2
 #' @import rdrobust
 #'

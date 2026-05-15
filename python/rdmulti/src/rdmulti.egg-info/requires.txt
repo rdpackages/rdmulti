@@ -1,4 +1,0 @@
-numpy
-pandas>=2.0.0
-scipy
-rdrobust>=1.1.1

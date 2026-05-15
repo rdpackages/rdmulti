@@ -1,11 +1,15 @@
 v 3
 d STATA Package: RDMULTI
+d Robust Local Polynomial Methods for RD designs with Multiple Cutoffs or Multiple Scores
+d rdmc: point estimation and robust bias-corrected inference for multi-cutoff designs.
+d rdmcplot: data-driven RD plots for multi-cutoff designs.
+d rdms: point estimation and robust bias-corrected inference for multi-score designs.
 d 
-d Authors: Matias D. Cattaneo, Department of Operations Research and Financial Engineering, Princeton University, cattaneo@princeton.edu
-d          Rocio Titiunik, Department of Politics, Princeton University, titiunik@princeton.edu
-d          Gonzalo Vazquez-Bare, Department of Economics, UC Santa Barbara, gvazquez@econ.ucsb.edu
+d Authors: Matias D. Cattaneo, Department of Operations Research and Financial Engineering, Princeton University, matias.d.cattaneo@gmail.com
+d          Rocio Titiunik, Department of Politics, Princeton University, rocio.titiunik@gmail.com
+d          Gonzalo Vazquez-Bare, Department of Economics, UC Santa Barbara, gvazquezbare@gmail.com
 d
-d Distribution-Date: 20250522
+d Distribution-Date: 20260515
 d 
 f rdmc.ado
 f rdmc.sthlp

@@ -1,10 +1,6 @@
 *******************************************************************************
-** RDMULTI: Analysis of Regression Discontinuity Designs 
-** 		    with multiple cutoffs or scores
-** Illustration file
-** Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
-********************************************************************************
-** net install rdmulti, from(https://raw.githubusercontent.com/rdpackages/rdmulti/master/stata) replace
+** RDMULTI Package
+** Plot Illustration
 ********************************************************************************
 
 clear all
@@ -128,7 +124,7 @@ rdmc y x, c(cutoff)
 
 gen binsopt = "mcolor(navy)" in 1/2
 gen xlineopt = "lcolor(navy) lpattern(dash)" in 1/2
-rdmcplot y x, c(cutoff) binsoptvar(binsopt) xlineopt(xlineopt) nopoly
+rdmcplot y x, c(cutoff) binsoptvar(binsopt) xlineoptvar(xlineopt) nopoly
 
 ********************************************************************************
 ** BIVARIATE SCORE: Setup and summary stats

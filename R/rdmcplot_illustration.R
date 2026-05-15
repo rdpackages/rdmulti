@@ -1,7 +1,6 @@
 ###################################################################
-# rdmulti: analysis of RD designs with multiple cutoffs or scores
-# RDMCPLOT illustration file
-# Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
+# RDMULTI Package
+# RD Plots illustration
 ###################################################################
 
 rm(list = ls())

@@ -1,13 +1,11 @@
 ###################################################################
-# rdmulti: analysis of RD designs with multiple cutoffs or scores
+# RDMULTI Package
 # Illustration file
-# Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
-
 rm(list = ls())
+set.seed(20260515)
 
 library(rdmulti)
-
 
 ###################################################################
 # Multiple cutoffs

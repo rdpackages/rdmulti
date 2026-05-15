@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0 2025-05-22}{...}
+{* *! version 2.0.0 2026-05-15}{...}
 {viewerjumpto "Syntax" "rdms##syntax"}{...}
 {viewerjumpto "Description" "rdms##description"}{...}
 {viewerjumpto "Options" "rdms##options"}{...}
@@ -10,7 +10,7 @@
 
 {title:Title}
 
-{p 4 8}{cmd:rdmcplot} {hline 2} RD Plots for Regression Discontinuity Designs with Multiple Cutoffs.{p_end}
+{p 4 8}{cmd:rdmcplot} {hline 2} Data-Driven RD Plots for Multi-Cutoff Designs.{p_end}
 
 {marker syntax}{...}
 {title:Syntax}
@@ -30,13 +30,15 @@
 {cmd:{opt hr:ightvar}(}{it:string}{cmd:)} 
 {cmd:{opt kernel:var}(}{it:string}{cmd:)} 
 {cmd:{opt weights:var}(}{it:string}{cmd:)} 
+{cmd:{opt masspoints:var}(}{it:string}{cmd:)}
 {cmd:{opt covs:var}(}{it:string}{cmd:)} 
-{cmd:{opt covseval:var}(}{it:string}{cmd:)} 
-{cmd:{opt covsdrop:var}(}{it:string}{cmd:)} 
+{cmd:{opt covs_eval:var}(}{it:string}{cmd:)}
+{cmd:{opt covs_drop:var}(}{it:string}{cmd:)}
 {cmd:{opt binsopt:var}(}{it:string}{cmd:)} 
 {cmd:{opt lineopt:var}(}{it:string}{cmd:)} 
 {cmd:{opt xlineopt:var}(}{it:string}{cmd:)} 
 {cmd:ci(}{it:cilevel}{cmd:)} 
+{cmd:shade}
 {cmd:nobins} 
 {cmd:nopoly}
 {cmd:noxline}  
@@ -49,7 +51,7 @@
 {marker description}{...}
 {title:Description}
 
-{p 4 8}{cmd:rdmcplot} plots estimated regression functions at each cutoff in regression discontinuity (RD) designs with multiple cutoffs.
+{p 4 8}{cmd:rdmcplot} implements data-driven regression discontinuity (RD) plots for designs with multiple cutoffs.
 For methodological background see
 {browse "https://rdpackages.github.io/references/Calonico-Cattaneo-Titiunik_2015_JASA.pdf":Calonico, Cattaneo and Titiunik (2015a)}, 
 {browse "https://rdpackages.github.io/references/Calonico-Cattaneo-Titiunik_2015_JASA.pdf":Calonico, Cattaneo and Titiunik (2015a)}, 
@@ -57,7 +59,7 @@ For methodological background see
 {browse "https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2016_JOP.pdf":Cattaneo, Keele, Titiunik and Vazquez-Bare (2016)}, and
 {browse "https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA.pdf":Cattaneo, Keele, Titiunik and Vazquez-Bare (2021)}.{p_end}
 
-{p 8 8}Companion commands are: {help rdmc:rdmc} for multi-cutoff RD estimation and inference, and {help rdms:rdms} for multi-score RD estimation and inference.{p_end}
+{p 8 8}Companion commands are: {help rdmc:rdmc} for point estimation and robust bias-corrected inference for multi-cutoff designs, and {help rdms:rdms} for point estimation and robust bias-corrected inference for multi-score designs.{p_end}
 
 {p 8 8}A detailed introduction to this command is given in
 {browse "https://rdpackages.github.io/references/Cattaneo-Titiunik-VazquezBare_2020_Stata.pdf": Cattaneo, Titiunik and Vazquez-Bare (2020)}.{p_end}
@@ -132,13 +134,16 @@ See {help rdplot:rdplot} for details.{p_end}
 {p 4 8}{cmd:{opt weights:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies the weights for {cmd:rdplot}.
 See {help rdplot:rdplot} for details.{p_end}
 
+{p 4 8}{cmd:{opt masspoints:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies how to handle repeated values in the running variable.
+See {help rdplot:rdplot} for details.{p_end}
+
 {p 4 8}{cmd:{opt covs:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies the covariates for {cmd:rdplot}.
 See {help rdplot:rdplot} for details.{p_end}
 
-{p 4 8}{cmd:{opt covseval:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies the evaluation points for additional covariates.
+{p 4 8}{cmd:{opt covs_eval:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies the evaluation points for additional covariates and is passed to {cmd:rdplot}'s {cmd:covs_eval()} option.
 See {help rdplot:rdplot} for details.{p_end}
 
-{p 4 8}{cmd:{opt covsdrop:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies whether collinear covariates should be dropped.
+{p 4 8}{cmd:{opt covs_drop:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies whether collinear covariates should be dropped and is passed to {cmd:rdplot}'s {cmd:covs_drop()} option.
 See {help rdplot:rdplot} for details.{p_end}
 
 {dlgtab:Plot}
@@ -150,6 +155,8 @@ See {help rdplot:rdplot} for details.{p_end}
 {p 4 8}{cmd:{opt xlineopt:var}(}{it:string}{cmd:)} a variable of length equal to the number of different cutoffs that specifies options for the vertical lines indicating the cutoffs.{p_end}
 
 {p 4 8}{cmd:ci(}{it:cilevel}{cmd:)} adds confidence intervals of level {it:cilevel} to the plot. Should be a number between 0 and 100 (e.g. {cmd:ci(95)} for 95% level).{p_end}
+
+{p 4 8}{cmd:shade} uses shaded confidence intervals when {cmd:ci()} is specified.{p_end}
 
 {p 4 8}{cmd:nobins} omits the bins plot.{p_end}
 
@@ -235,12 +242,12 @@ See {help rdplot:rdplot} for details.{p_end}
 {title:Authors}
 
 {p 4 8}Matias D. Cattaneo, Princeton University, Princeton, NJ.
-{browse "mailto:cattaneo@princeton.edu":cattaneo@princeton.edu}.{p_end}
+{browse "mailto:matias.d.cattaneo@gmail.com":matias.d.cattaneo@gmail.com}.{p_end}
 
 {p 4 8}Rocio Titiunik, Princeton University, Princeton, NJ.
-{browse "mailto:titiunik@princeton.edu":titiunik@princeton.edu}.{p_end}
+{browse "mailto:rocio.titiunik@gmail.com":rocio.titiunik@gmail.com}.{p_end}
 
 {p 4 8}Gonzalo Vazquez-Bare, UC Santa Barbara, Santa Barbara, CA.
-{browse "mailto:gvazquez@econ.ucsb.edu":gvazquez@econ.ucsb.edu}.{p_end}
+{browse "mailto:gvazquezbare@gmail.com":gvazquezbare@gmail.com}.{p_end}
 
 

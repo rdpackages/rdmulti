@@ -6,42 +6,55 @@ The package `rdmulti` implements estimation, inference, and graphical procedures
 - `rdmcplot`: data-driven RD plots for multi-cutoff designs.
 - `rdms`: point estimation and robust bias-corrected inference for multi-score designs.
 
-## Python Implementation
+See references for methodological and practical details.
 
-To install/update in Python type:
+Website: [https://rdpackages.github.io/rdmulti](https://rdpackages.github.io/rdmulti).
+
+Source code: [https://github.com/rdpackages/rdmulti](https://github.com/rdpackages/rdmulti).
+
+## Authors
+
+Matias D. Cattaneo (<matias.d.cattaneo@gmail.com>)
+
+Ricardo Masini (<ricardo.masini@gmail.com>)
+
+Rocio Titiunik (<rocio.titiunik@gmail.com>)
+
+Gonzalo Vazquez-Bare (<gvazquezbare@gmail.com>)
+
+## Installation
+
+To install/update use pip:
 ```
 pip install rdmulti
 ```
 
-- Help: [PYPI repository](https://pypi.org/project/rdmulti/).
+## Usage
+```python
+import pandas as pd
+from rdmulti import rdmc, rdmcplot
 
-- Replication: [rdmulti illustration](Python/rdmulti_illustration.py), [multi-cutoff data](Python/simdata_multic.csv), [cumulative-cutoff data](Python/simdata_cumul.csv), [multi-score data](Python/simdata_multis.csv).
+df = pd.read_csv("simdata_multic.csv")
 
-## R Implementation
+# Multi-cutoff estimation
+fit = rdmc(df["y"], df["x"], df["c"])
 
-To install/update in R type:
-```
-install.packages('rdmulti')
-```
-
-- Help: [R Manual](https://cran.r-project.org/web/packages/rdmulti/rdmulti.pdf), [CRAN repository](https://cran.r-project.org/package=rdmulti).
-
-- Replication: [rdmulti illustration](R/rdmulti_illustration.R), [rdmcplot illustration](R/rdmcplot_illustration.R), [multi-cutoff data](R/simdata_multic.csv), [cumulative-cutoff data](R/simdata_cumul.csv), [multi-score data](R/simdata_multis.csv), [R illustration](R/rdmulti_illustration.pdf).
-
-## Stata Implementation
-
-To install/update in Stata type:
-```
-net install rdmulti, from(https://raw.githubusercontent.com/rdpackages/rdmulti/main/stata) replace
+# Multi-cutoff plot data and figure
+plot = rdmcplot(df["y"], df["x"], df["c"])
 ```
 
-- Help: [rdmc](stata/rdmc.pdf), [rdmcplot](stata/rdmcplot.pdf), [rdms](stata/rdms.pdf).
+- Replication: [rdmulti illustration](https://github.com/rdpackages/rdmulti/blob/main/Python/rdmulti_illustration.py), [multi-cutoff data](https://github.com/rdpackages/rdmulti/blob/main/Python/simdata_multic.csv), [cumulative-cutoff data](https://github.com/rdpackages/rdmulti/blob/main/Python/simdata_cumul.csv), [multi-score data](https://github.com/rdpackages/rdmulti/blob/main/Python/simdata_multis.csv).
 
-- Replication: [rdmulti illustration](stata/rdmulti_illustration.do), [rdmcplot illustration](stata/rdmcplot_illustration.do), [multi-cutoff data](stata/simdata_multic.dta), [cumulative-cutoff data](stata/simdata_cumul.dta), [multi-score data](stata/simdata_multis.dta).
+## Dependencies
+
+- numpy
+- pandas
+- scipy
+- rdrobust
 
 ## References
 
-For overviews and introductions, see the [rdpackages website](https://rdpackages.github.io).
+For overviews and introductions, see [rdpackages website](https://rdpackages.github.io).
 
 ### Software and Implementation
 
@@ -60,10 +73,3 @@ _Journal of Politics_ 78(4): 1229-1248.<br>
 - Cattaneo, Keele, Titiunik and Vazquez-Bare (2020): [Extrapolating Treatment Effects in Multi-Cutoff Regression Discontinuity Designs](https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA.pdf).<br>
 _Journal of the American Statistical Association_ 116(536): 1941-1952.<br>
 [Supplemental Appendix](https://rdpackages.github.io/references/Cattaneo-Keele-Titiunik-VazquezBare_2021_JASA--Supplement.pdf).
-
-## Funding
-
-This work was supported in part by the National Science Foundation through grant [SES-1357561](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1357561).
-
-
-<br><br>

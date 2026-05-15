@@ -1,20 +1,21 @@
 ###################################################################
-# rdmc: analysis of RD designs with multiple cutoffs
-# !version 1.2 22-May-2025
+# rdmc: point estimation and robust bias-corrected inference for multi-cutoff designs
+# !version 2.0.0 15-May-2026
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
-#' Analysis of RD designs with multiple cutoffs
+#' Point estimation and robust bias-corrected inference for multi-cutoff designs
 #'
-#' \code{rdmc()} analyzes RD designs with multiple cutoffs.
+#' \code{rdmc()} implements point estimation and robust bias-corrected inference
+#' for Regression Discontinuity (RD) designs with multiple cutoffs.
 #'
 #'
 #' @author
-#' Matias Cattaneo, Princeton University. \email{cattaneo@princeton.edu}
+#' Matias D. Cattaneo, Princeton University. \email{matias.d.cattaneo@gmail.com}
 #'
-#' Rocio Titiunik, Princeton University. \email{titiunik@princeton.edu}
+#' Rocio Titiunik, Princeton University. \email{rocio.titiunik@gmail.com}
 #'
-#' Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquez@econ.ucsb.edu}
+#' Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquezbare@gmail.com}
 #'
 #' @references
 #'
@@ -70,11 +71,17 @@
 #' @param nnmatchvec vector of cutoff-specific nearest neighbors for variance
 #'   estimation. See \code{rdrobust()} for details.
 #' @param cluster cluster ID variable. See \code{rdrobust()} for details.
+#' @param ginv.tolvec vector of cutoff-specific tolerances for generalized
+#'   inverse calculations. See \code{rdrobust()} for details.
+#' @param sharpbwvec vector indicating whether fuzzy RD bandwidth selection
+#'   uses the sharp RD model at each cutoff. See \code{rdrobust()} for details.
 #' @param level confidence level for confidence intervals. See \code{rdrobust()}
 #'   for details.
 #' @param plot plots cutoff-specific estimates and weights.
 #' @param conventional reports conventional, instead of robust-bias corrected,
 #'   p-values and confidence intervals.
+#' @param subset optional subset of observations to use.
+#' @param data optional data frame for resolving string variable names.
 #'
 #'
 #' @return
@@ -116,11 +123,31 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
                 bwselectvec=NULL,scaleparvec=NULL,scaleregulvec=NULL,
                 masspointsvec=NULL,bwcheckvec=NULL,bwrestrictvec=NULL,
                 stdvarsvec=NULL,vcevec=NULL,nnmatchvec=NULL,cluster=NULL,
-                level=95,plot=FALSE,conventional=FALSE){
+                ginv.tolvec=NULL,sharpbwvec=NULL,level=95,plot=FALSE,
+                conventional=FALSE,subset=NULL,data=NULL){
 
   #################################################################
   # Setup and error checking
   #################################################################
+
+  if (!is.null(data)){
+    if (is.character(Y) && length(Y)==1) Y <- data[[Y]]
+    if (is.character(X) && length(X)==1) X <- data[[X]]
+    if (is.character(C) && length(C)==1) C <- data[[C]]
+    if (!is.null(fuzzy) && is.character(fuzzy) && length(fuzzy)==1) fuzzy <- data[[fuzzy]]
+    if (!is.null(cluster) && is.character(cluster) && length(cluster)==1) cluster <- data[[cluster]]
+    if (!is.null(covs_mat) && is.character(covs_mat)) covs_mat <- data[,covs_mat,drop=FALSE]
+  }
+
+  n.orig <- length(Y)
+  if (!is.null(subset)){
+    Y <- Y[subset]
+    X <- X[subset]
+    C <- C[subset]
+    if (!is.null(fuzzy) && length(fuzzy)==n.orig) fuzzy <- fuzzy[subset]
+    if (!is.null(cluster) && length(cluster)==n.orig) cluster <- cluster[subset]
+    if (!is.null(covs_mat) && nrow(as.matrix(covs_mat))==n.orig) covs_mat <- as.matrix(covs_mat)[subset,,drop=FALSE]
+  }
 
   if (!is.numeric(C)){stop('C has to be numeric')}
   if (max(C,na.rm=TRUE)>=max(X,na.rm=TRUE) | min(C,na.rm=TRUE)<=min(X,na.rm=TRUE)){stop('cutoff variable outside range of running variable')}
@@ -150,6 +177,8 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
   if (is.null(masspointsvec)) masspointsvec <- rep('adjust',cnum)
   if (is.null(bwrestrictvec)) bwrestrictvec <- rep(TRUE,cnum)
   if (is.null(stdvarsvec)) stdvarsvec <- rep(FALSE,cnum)
+  if (is.null(ginv.tolvec)) ginv.tolvec <- rep(1e-20,cnum)
+  if (is.null(sharpbwvec)) sharpbwvec <- rep(FALSE,cnum)
   if (!is.null(covs_mat)){
     covs_mat <- as.matrix(covs_mat)
     if (!is.null(covs_list)){
@@ -206,6 +235,11 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
 
     yc <- Y[abs(C-c)<=.Machine$double.eps]
     xc <- Xc[abs(C-c)<=.Machine$double.eps]
+    if (!is.null(fuzzy)){
+      fuzzyc <- fuzzy[abs(C-c)<=.Machine$double.eps]
+    } else {
+      fuzzyc <- NULL
+    }
     if (!is.null(cluster)){
       cc <- cluster[abs(C-c)<=.Machine$double.eps]
     } else {
@@ -214,8 +248,8 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
 
     if (!is.null(weightsvec)){
       weightaux <- weightsvec[count]
-      weightsc <- paste0("weightsc <- ",weightaux,"[abs(C-c)<=.Machine$double.eps]")
-      weightsc <- eval(parse(text=weightsc))
+      weights_source <- eval(parse(text=weightaux), parent.frame())
+      weightsc <- weights_source[abs(C-c)<=.Machine$double.eps]
     } else{
       weightsc <- NULL
     }
@@ -232,7 +266,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
     }
 
     rdr.tmp <- try(rdrobust::rdrobust(yc,xc,
-                                      fuzzy=fuzzy,
+                                      fuzzy=fuzzyc,
                                       deriv=derivvec[count],
                                       p=pvec[count],
                                       q=qvec[count],
@@ -241,6 +275,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
                                       rho=rhovec[count],
                                       covs=covs_aux,
                                       covs_drop=covs_dropvec[count],
+                                      ginv.tol=ginv.tolvec[count],
                                       kernel=kernelvec[count],
                                       weights=weightsc,
                                       bwselect=bwselectvec[count],
@@ -253,6 +288,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
                                       vce=vcevec[count],
                                       nnmatch=nnmatchvec[count],
                                       cluster=cc,
+                                      sharpbw=sharpbwvec[count],
                                       level=level),
                    silent=TRUE)
 
@@ -314,7 +350,7 @@ rdmc <- function(Y,X,C,fuzzy=NULL,derivvec=NULL,pooled_opt=NULL,verbose=FALSE,
   #################################################################
 
   if (verbose==TRUE){
-    cat(summary(rdr))
+    print(summary(rdr))
     cat('\n')
   }
 

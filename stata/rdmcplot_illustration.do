@@ -1,10 +1,6 @@
 *******************************************************************************
-** RDMULTI: Analysis of Regression Discontinuity Designs 
-** 		    with multiple cutoffs or scores
+** RDMULTI Package
 ** RDMCPLOT Illustration file
-** Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
-********************************************************************************
-** net install rdmulti, from(https://raw.githubusercontent.com/rdpackages/rdmulti/master/stata) replace
 ********************************************************************************
 
 clear all

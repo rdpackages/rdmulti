@@ -1,8 +1,6 @@
 *******************************************************************************
-** RDMULTI: analysis of Regression Discontinuity Designs 
-** 		    with multiple cutoffs or scores
+** RDMULTI Package
 ** Simulated datasets
-** Authors: Matias Cattaneo, Rocío Titiunik, Gonzalo Vazquez-Bare
 ********************************************************************************
 
 ********************************************************************************
@@ -10,6 +8,7 @@
 ********************************************************************************
 
 clear
+set seed 20260515
 set obs 2
 
 gen double c = _n

@@ -1,20 +1,22 @@
 ###################################################################
-# rdms: analysis of RD designs with multiple scores
-# !version 1.2 22-May-2025
+# rdms: point estimation and robust bias-corrected inference for multi-score designs
+# !version 2.0.0 15-May-2026
 # Authors: Matias Cattaneo, Rocio Titiunik, Gonzalo Vazquez-Bare
 ###################################################################
 
-#' Analysis of RD designs with cumulative cutoffs or two running variables
+#' Point estimation and robust bias-corrected inference for multi-score designs
 #'
-#' \code{rdms()} analyzes RD designs with cumulative cutoffs or two running variables.
+#' \code{rdms()} implements point estimation and robust bias-corrected inference
+#' for Regression Discontinuity (RD) designs with multiple scores, including
+#' cumulative-cutoff designs and designs with two running variables.
 #'
 #'
 #' @author
-#' Matias Cattaneo, Princeton University. \email{cattaneo@princeton.edu}
+#' Matias D. Cattaneo, Princeton University. \email{matias.d.cattaneo@gmail.com}
 #'
-#' Rocio Titiunik, Princeton University. \email{titiunik@princeton.edu}
+#' Rocio Titiunik, Princeton University. \email{rocio.titiunik@gmail.com}
 #'
-#' Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquez@econ.ucsb.edu}
+#' Gonzalo Vazquez-Bare, UC Santa Barbara. \email{gvazquezbare@gmail.com}
 #'
 #' @references
 #'
@@ -72,11 +74,17 @@
 #' @param nnmatchvec vector of cutoff-specific nearest neighbors for variance
 #'   estimation. See \code{rdrobust()} for details.
 #' @param cluster cluster ID variable. See \code{rdrobust()} for details.
+#' @param ginv.tolvec vector of cutoff-specific tolerances for generalized
+#'   inverse calculations. See \code{rdrobust()} for details.
+#' @param sharpbwvec vector indicating whether fuzzy RD bandwidth selection
+#'   uses the sharp RD model at each cutoff. See \code{rdrobust()} for details.
 #' @param level confidence level for confidence intervals. See \code{rdrobust()}
 #'   for details.
 #' @param plot plots cutoff-specific and pooled estimates.
 #' @param conventional reports conventional, instead of robust-bias corrected,
 #'   p-values and confidence intervals.
+#' @param subset optional subset of observations to use.
+#' @param data optional data frame for resolving string variable names.
 #'
 #'
 #' @return \item{B}{vector of bias-corrected coefficients}
@@ -104,11 +112,37 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
                  bwselectvec=NULL,scaleparvec=NULL,scaleregulvec=NULL,
                  masspointsvec=NULL,bwcheckvec=NULL,bwrestrictvec=NULL,
                  stdvarsvec=NULL,vcevec=NULL,nnmatchvec=NULL,cluster=NULL,
-                 level=95,plot=FALSE,conventional=FALSE){
+                 ginv.tolvec=NULL,sharpbwvec=NULL,level=95,plot=FALSE,
+                 conventional=FALSE,subset=NULL,data=NULL){
 
   #################################################################
   # Setup and error checking
   #################################################################
+
+  if (!is.null(data)){
+    if (is.character(Y) && length(Y)==1) Y <- data[[Y]]
+    if (is.character(X) && length(X)==1) X <- data[[X]]
+    if (is.character(C) && length(C)==1) C <- unique(na.omit(data[[C]]))
+    if (!is.null(X2) && is.character(X2) && length(X2)==1) X2 <- data[[X2]]
+    if (!is.null(zvar) && is.character(zvar) && length(zvar)==1) zvar <- data[[zvar]]
+    if (!is.null(C2) && is.character(C2) && length(C2)==1) C2 <- unique(na.omit(data[[C2]]))
+    if (!is.null(xnorm) && is.character(xnorm) && length(xnorm)==1) xnorm <- data[[xnorm]]
+    if (!is.null(fuzzy) && is.character(fuzzy) && length(fuzzy)==1) fuzzy <- data[[fuzzy]]
+    if (!is.null(cluster) && is.character(cluster) && length(cluster)==1) cluster <- data[[cluster]]
+    if (!is.null(covs_mat) && is.character(covs_mat)) covs_mat <- data[,covs_mat,drop=FALSE]
+  }
+
+  n.orig <- length(Y)
+  if (!is.null(subset)){
+    Y <- Y[subset]
+    X <- X[subset]
+    if (!is.null(X2) && length(X2)==n.orig) X2 <- X2[subset]
+    if (!is.null(zvar) && length(zvar)==n.orig) zvar <- zvar[subset]
+    if (!is.null(xnorm) && length(xnorm)==n.orig) xnorm <- xnorm[subset]
+    if (!is.null(fuzzy) && length(fuzzy)==n.orig) fuzzy <- fuzzy[subset]
+    if (!is.null(cluster) && length(cluster)==n.orig) cluster <- cluster[subset]
+    if (!is.null(covs_mat) && nrow(as.matrix(covs_mat))==n.orig) covs_mat <- as.matrix(covs_mat)[subset,,drop=FALSE]
+  }
 
   if (!is.null(X2) & is.null(zvar)) stop('Need to specify zvar when X2 is specified')
   if (!is.null(X2) & is.null(C2)) stop('Need to specify C2 if X2 is specified')
@@ -148,6 +182,8 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
   if (is.null(masspointsvec)) masspointsvec <- rep('adjust',cnum)
   if (is.null(bwrestrictvec)) bwrestrictvec <- rep(TRUE,cnum)
   if (is.null(stdvarsvec)) stdvarsvec <- rep(FALSE,cnum)
+  if (is.null(ginv.tolvec)) ginv.tolvec <- rep(1e-20,cnum)
+  if (is.null(sharpbwvec)) sharpbwvec <- rep(FALSE,cnum)
   if (!is.null(covs_mat)){
     covs_mat <- as.matrix(covs_mat)
     if (!is.null(covs_list)){
@@ -177,28 +213,28 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
 
     for (c in 1:cnum){
 
-      xc <- X - C[c]
+      xc.full <- X - C[c]
       Rc <- rangemat - C
 
-      yc <- Y[xc>=Rc[c,1] & xc<=Rc[c,2]]
-      xc <- xc[xc>=Rc[c,1] & xc<=Rc[c,2]]
+      use <- xc.full>=Rc[c,1] & xc.full<=Rc[c,2]
+      yc <- Y[use]
+      xc <- xc.full[use]
 
       if (!is.null(cluster)){
-        cc <- cluster[xc>=Rc[c,1] & xc<=Rc[c,2]]
+        cc <- cluster[use]
       } else {
         cc <- NULL
       }
 
       if (!is.null(weightsvec)){
         weightaux <- weightsvec[c]
-        weightsc <- paste0("weightsc <- ",weightaux,"[xc>=Rc[c,1] & xc<=Rc[c,2]]")
-        weightsc <- eval(parse(text=weightsc))
+        weightsc <- eval(parse(text=weightaux), parent.frame())[use]
       } else{
         weightsc <- NULL
       }
 
       if (!is.null(covs_mat)){
-        covs_mat_c <- covs_mat[xc>=Rc[c,1] & xc<=Rc[c,2],]
+        covs_mat_c <- covs_mat[use,,drop=FALSE]
         if (!is.null(covs_list)){
           covs_aux <- covs_mat_c[,covs_list[[c]]]
         } else{
@@ -207,9 +243,14 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
       } else {
         covs_aux <- NULL
       }
+      if (!is.null(fuzzy)){
+        fuzzyc <- fuzzy[use]
+      } else {
+        fuzzyc <- NULL
+      }
 
       rdr.tmp <- rdrobust::rdrobust(yc,xc,
-                                   fuzzy=fuzzy,
+                                   fuzzy=fuzzyc,
                                    deriv=derivvec[c],
                                    p=pvec[c],
                                    q=qvec[c],
@@ -218,6 +259,7 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
                                    rho=rhovec[c],
                                    covs=covs_aux,
                                    covs_drop=covs_dropvec[c],
+                                   ginv.tol=ginv.tolvec[c],
                                    kernel=kernelvec[c],
                                    weights=weightsc,
                                    bwselect=bwselectvec[c],
@@ -230,6 +272,7 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
                                    vce=vcevec[c],
                                    nnmatch=nnmatchvec[c],
                                    cluster=cc,
+                                   sharpbw=sharpbwvec[c],
                                    level=level)
 
       B[1,c] <- rdr.tmp$Estimate[2]
@@ -252,27 +295,27 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
 
     for (c in 1:cnum){
 
-      xc <- sqrt((X-C[c])^2+(X2-C2[c])^2)*(2*zvar-1)
+      xc.full <- sqrt((X-C[c])^2+(X2-C2[c])^2)*(2*zvar-1)
 
-      yc <- Y[xc>=rangemat[c,1] & xc<=rangemat[c,2]]
-      xc <- xc[xc>=rangemat[c,1] & xc<=rangemat[c,2]]
+      use <- xc.full>=rangemat[c,1] & xc.full<=rangemat[c,2]
+      yc <- Y[use]
+      xc <- xc.full[use]
 
       if (!is.null(cluster)){
-        cc <- cluster[xc>=rangemat[c,1] & xc<=rangemat[c,2]]
+        cc <- cluster[use]
       } else {
         cc <- NULL
       }
 
       if (!is.null(weightsvec)){
         weightaux <- weightsvec[c]
-        weightsc <- paste0("weightsc <- ",weightaux,"[xc>=rangemat[c,1] & xc<=rangemat[c,2]]")
-        weightsc <- eval(parse(text=weightsc))
+        weightsc <- eval(parse(text=weightaux), parent.frame())[use]
       } else{
         weightsc = NULL
       }
 
       if (!is.null(covs_mat)){
-        covs_mat_c <- covs_mat[xc>=rangemat[c,1] & xc<=rangemat[c,2],]
+        covs_mat_c <- covs_mat[use,,drop=FALSE]
         if (!is.null(covs_list)){
           covs_aux <- covs_mat_c[,covs_list[[c]]]
         } else{
@@ -281,9 +324,14 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
       } else {
         covs_aux <- NULL
       }
+      if (!is.null(fuzzy)){
+        fuzzyc <- fuzzy[use]
+      } else {
+        fuzzyc <- NULL
+      }
 
       rdr.tmp <- rdrobust::rdrobust(yc,xc,
-                                   fuzzy=fuzzy,
+                                   fuzzy=fuzzyc,
                                    deriv=derivvec[c],
                                    p=pvec[c],
                                    q=qvec[c],
@@ -292,6 +340,7 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
                                    rho=rhovec[c],
                                    covs=covs_aux,
                                    covs_drop=covs_dropvec[c],
+                                   ginv.tol=ginv.tolvec[c],
                                    kernel=kernelvec[c],
                                    weights=weightsc,
                                    bwselect=bwselectvec[c],
@@ -304,6 +353,7 @@ rdms <- function(Y,X,C,X2=NULL,zvar=NULL,C2=NULL,rangemat=NULL,xnorm=NULL,
                                    vce=vcevec[c],
                                    nnmatch=nnmatchvec[c],
                                    cluster=cc,
+                                   sharpbw=sharpbwvec[c],
                                    level=level)
 
       B[1,c] <- rdr.tmp$Estimate[2]
