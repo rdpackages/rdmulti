@@ -4,3 +4,4 @@
 ^figure$
 Rplots\.pdf$
 ^.*\.Rcheck$
+^.*\.Rproj$
