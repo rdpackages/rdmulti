@@ -16,6 +16,7 @@ AGENTS.md
 !/stata/**
 !/README.md
 !/LICENSE.md
+!/CHANGELOG.md
 
 # Keep only the Python package subtree public under Python/.
 /Python/*
