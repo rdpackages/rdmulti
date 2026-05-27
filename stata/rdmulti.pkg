@@ -4,6 +4,7 @@ d Robust Local Polynomial Methods for RD designs with Multiple Cutoffs or Multip
 d rdmc: point estimation and robust bias-corrected inference for multi-cutoff designs.
 d rdmcplot: data-driven RD plots for multi-cutoff designs.
 d rdms: point estimation and robust bias-corrected inference for multi-score designs.
+d Mata object code is distributed in one library file: lrdmulti.mlib.
 d 
 d Authors: Matias D. Cattaneo, Department of Operations Research and Financial Engineering, Princeton University, matias.d.cattaneo@gmail.com
 d          Rocio Titiunik, Department of Politics, Princeton University, rocio.titiunik@gmail.com
@@ -17,6 +18,7 @@ f rdmcplot.ado
 f rdmcplot.sthlp
 f rdms.ado
 f rdms.sthlp
+f lrdmulti.mlib
 
 
 

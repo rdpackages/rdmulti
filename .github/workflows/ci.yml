@@ -33,6 +33,7 @@ jobs:
           test -f Python/rdmulti/setup.cfg
           test -f stata/stata.toc
           test -f stata/rdmulti.pkg
+          test -f stata/lrdmulti.mlib
 
   python-build:
     name: Python build
