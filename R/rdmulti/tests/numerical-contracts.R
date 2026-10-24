@@ -20,6 +20,10 @@ if (is.na(repo_root)) {
 
 suppressPackageStartupMessages(library(rdmulti))
 
+# Bandwidth selection can drift by a few parts in 10 million across numerical
+# stacks. Keep the historical values with a one-part-per-million relative bound.
+bandwidth_tolerance <- 1e-6
+
 assert_allclose <- function(actual, expected, tolerance = 1e-8) {
   comparison <- all.equal(
     unname(actual),
@@ -41,7 +45,9 @@ assert_allclose(
 )
 assert_allclose(
   result$Pv,
-  matrix(c(7.84407236e-48, 8.54527540e-16, 0, 7.41987105e-04), nrow = 1)
+  matrix(c(7.84407236e-48, 8.54527540e-16, 0, 7.41987105e-04), nrow = 1),
+  # Match the relative tolerance of the Python p-value baseline.
+  tolerance = 1e-6
 )
 assert_allclose(
   result$H,
@@ -53,7 +59,8 @@ assert_allclose(
       13.6840172, 13.6840172
     ),
     nrow = 2
-  )
+  ),
+  tolerance = bandwidth_tolerance
 )
 assert_allclose(
   result$Nh,
@@ -74,7 +81,8 @@ assert_allclose(
 )
 assert_allclose(
   result_cumul$H,
-  matrix(c(15.10927597, 15.10927597, 12.22129226, 12.22129226, NA_real_, NA_real_), nrow = 2)
+  matrix(c(15.10927597, 15.10927597, 12.22129226, 12.22129226, NA_real_, NA_real_), nrow = 2),
+  tolerance = bandwidth_tolerance
 )
 assert_allclose(
   result_cumul$Nh,
